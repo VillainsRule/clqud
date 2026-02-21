@@ -1,0 +1,15 @@
+# modules
+node_modules
+bun.lock
+
+# protected
+api/cert
+api/db
+api/files
+.env
+
+# builds
+dist
+
+# mac conf
+.DS_Store

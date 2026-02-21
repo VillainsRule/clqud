@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "**/sites.db": "json",
+        "**/users.db": "json"
+    }
+}

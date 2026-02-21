@@ -1,0 +1,29 @@
+{
+    "compilerOptions": {
+        "target": "ES2024",
+        "lib": ["ES2024"],
+        "moduleResolution": "node10",
+        "module": "es2022",
+
+        "strict": true,
+        "noEmit": true,
+        "noImplicitAny": true,
+        "noImplicitThis": true,
+        "alwaysStrict": true,
+        "strictNullChecks": true,
+        "strictFunctionTypes": true,
+        "strictBindCallApply": true,
+        "strictPropertyInitialization": false,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noImplicitReturns": true,
+        "noFallthroughCasesInSwitch": true,
+        "esModuleInterop": true,
+        "forceConsistentCasingInFileNames": true,
+        "skipLibCheck": true,
+        "noEmitOnError": true,
+        "exactOptionalPropertyTypes": true
+    },
+    "include": ["src"],
+    "exclude": ["node_modules"]
+}
