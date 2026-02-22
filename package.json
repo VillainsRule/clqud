@@ -3,10 +3,9 @@
     "main": "api/src/main.ts",
     "scripts": {
         "start": "cd api && bun src/main.ts",
-        "prep": "cd app && bun install && bunx --bun vite build && cd ../api && bun install && cd ..",
+        "prep": "bun install && cd app && bunx --bun vite build",
         "initpk": "cd api && cp .env.example .env && nano .env",
         "pull": "git pull && bun prep",
-        "update": "cd app && bun update && cd ../api && bun update && cd ..",
         "apidev": "cd api && DEV=1 bun --watch src/main.ts",
         "appdev": "cd app && bun watch.ts",
         "appdev2": "cd app && bunx --bun vite dev",
