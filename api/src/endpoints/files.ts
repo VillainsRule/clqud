@@ -26,7 +26,7 @@ const files = new Elysia({ name: 'files' })
             return status(500);
         }
 
-        const files = new Set(glob.scanSync({ cwd: fileDir, followSymlinks: false }));
+        const files = new Set(glob.scanSync({ cwd: fileDir, followSymlinks: false, dot: true }));
         const fileTree: TreeNode = { name: '/', type: 'folder', fullPath: '', children: [] };
 
         files.forEach(e => {
@@ -46,6 +46,8 @@ const files = new Elysia({ name: 'files' })
                 treeSegment = seg;
             }
 
+            if (e.endsWith('.DS_Store')) return;
+
             const fullPath = treeSegment.fullPath + '/' + parts[0];
             treeSegment.children.push({ type: 'file', name: parts[0], fullPath, locked: files.has((fullPath + '.auth').slice(1)) });
         });
@@ -59,7 +61,7 @@ const files = new Elysia({ name: 'files' })
 
         const filePath = path.join(fileDir, body.path);
         if (!filePath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
-        if (filePath.endsWith('.auth')) return status(400, { error: 'invalid file path' });
+        if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
         if (!fs.existsSync(filePath)) return status(400, { error: 'file does not exist' });
 
         const passwordPath = filePath + '.auth';
@@ -75,7 +77,7 @@ const files = new Elysia({ name: 'files' })
 
         const filePath = path.join(fileDir, body.path);
         if (!filePath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
-        if (filePath.endsWith('.auth')) return status(400, { error: 'invalid file path' });
+        if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
         if (!fs.existsSync(filePath)) return status(400, { error: 'file does not exist' });
 
         const fileContents = fs.readFileSync(filePath, 'utf-8');
@@ -88,7 +90,7 @@ const files = new Elysia({ name: 'files' })
 
         const filePath = path.join(fileDir, body.path);
         if (!filePath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
-        if (filePath.endsWith('.auth')) return status(400, { error: 'invalid file path' });
+        if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
         if (!fs.existsSync(filePath)) return status(400, { error: 'file does not exist' });
 
         if (Buffer.byteLength(body.contents, 'utf-8') > configDB.db.maxSizeMB * 1024 * 1024)
@@ -108,6 +110,7 @@ const files = new Elysia({ name: 'files' })
 
         if (!oldPath.startsWith(fileDir + path.sep) || !newPath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
         if (oldPath.endsWith('.auth') || newPath.endsWith('.auth')) return status(400, { error: 'invalid file path' });
+        if (oldPath.includes('.DS_Store') || newPath.includes('DS_Store')) return status(400, { error: 'invalid file path' });
 
         const ne = getNameExt(newPath);
         if (!validateName(ne, body.newPath.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
@@ -126,14 +129,16 @@ const files = new Elysia({ name: 'files' })
 
         const filePath = path.join(fileDir, body.path);
         if (!filePath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
-        if (filePath.endsWith('.auth')) return status(400, { error: 'invalid file path' });
+        if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
         if (fs.existsSync(filePath)) return status(400, { error: 'file already exists' });
 
         const ne = getNameExt(filePath);
-        if (!validateName(ne, body.path.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
+        if (!validateName(ne, body.type)) return status(400, { error: 'invalid file path' });
 
-        if (body.type === 'folder') fs.mkdirSync(filePath);
-        else fs.writeFileSync(filePath, '');
+        if (body.type === 'folder') {
+            fs.mkdirSync(filePath);
+            fs.writeFileSync(path.join(filePath, '.DS_Store'), '');
+        } else fs.writeFileSync(filePath, '');
 
         return {};
     }, { body: t.Object({ path: t.String(), type: t.Union([t.Literal('file'), t.Literal('folder')]) }), cookie: t.Object({ session: t.String() }) })
@@ -144,7 +149,7 @@ const files = new Elysia({ name: 'files' })
 
         const filePath = path.join(fileDir, body.path);
         if (!filePath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
-        if (filePath.endsWith('.auth')) return status(400, { error: 'invalid file path' });
+        if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
         if (!fs.existsSync(filePath)) return status(400, { error: 'file does not exist' });
 
         const ne = getNameExt(filePath);
@@ -162,7 +167,7 @@ const files = new Elysia({ name: 'files' })
 
         const filePath = path.join(fileDir, body.path);
         if (!filePath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
-        if (filePath.endsWith('.auth')) return status(400, { error: 'invalid file path' });
+        if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
 
         const ne = getNameExt(filePath);
         if (!validateName(ne, body.path.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
@@ -189,7 +194,7 @@ const files = new Elysia({ name: 'files' })
 
             const filePath = path.join(fileDir, paths[i]);
             if (!filePath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
-            if (filePath.endsWith('.auth')) return status(400, { error: 'invalid file path' });
+            if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
 
             const ne = getNameExt(filePath);
             if (!validateName(ne, paths[i].includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
@@ -207,9 +212,12 @@ const files = new Elysia({ name: 'files' })
         if (configDB.db.locked) return status(423, { error: 'instance is locked' });
         if (!sessionDB.has(session.value)) return status(401);
 
+        if (body.password.length > 64) return status(413, { error: 'password is too long' });
+        if (body.password.length < 2) return status(403, { error: 'password is too short' });
+
         const filePath = path.join(fileDir, body.path);
         if (!filePath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
-        if (filePath.endsWith('.auth')) return status(400, { error: 'invalid file path' });
+        if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
 
         const ne = getNameExt(filePath);
         if (!validateName(ne, body.path.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
@@ -228,7 +236,7 @@ const files = new Elysia({ name: 'files' })
 
         const filePath = path.join(fileDir, body.path);
         if (!filePath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
-        if (filePath.endsWith('.auth')) return status(400, { error: 'invalid file path' });
+        if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
 
         const ne = getNameExt(filePath);
         if (!validateName(ne, body.path.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
