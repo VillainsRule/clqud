@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react';
 
-import { Button } from '@/components/shadcn/button';
-import { Input } from '@/components/shadcn/input';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 
 export default function Unlock() {
     const [error, setError] = useState<string>('');

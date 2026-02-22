@@ -5,8 +5,8 @@ import { observer } from 'mobx-react-lite'
 
 import { Editor } from '@monaco-editor/react'
 
-import { Button } from './components/shadcn/button'
-import { Input } from './components/shadcn/input'
+import { Button } from './components/ui/button'
+import { Input } from './components/ui/input'
 
 import authManager from './managers/AuthManager'
 import fileManager from './managers/FileManager'
@@ -15,15 +15,15 @@ import Auth from './components/Auth'
 import Unlock from './components/Unlock'
 import Welcome from './components/Welcome'
 
-import Main from './components/dash/Main'
-import SideBar from './components/dash/navi/SideBar'
-import TopBar from './components/dash/navi/TopBar'
+import Dashboard from './components/Dashboard'
+import SideBar from './components/navi/SideBar'
+import TopBar from './components/navi/TopBar'
 
-import Config from './components/dash/panels/Config'
-import Labs from './components/dash/panels/Labs'
-import Passkeys from './components/dash/panels/Passkeys'
+import Config from './components/control/Config'
+import Labs from './components/control/Labs'
+import Passkeys from './components/control/Passkeys'
 
-import FileSwitch from './components/dash/file/Switch'
+import FileSwitch from './components/file/Switch'
 
 import api, { errorFrom } from './lib/eden'
 import { ShaddProvider } from './lib/shadd'
@@ -154,7 +154,7 @@ const App = observer(function App() {
                 <Route path='/' element={<Welcome />} />
                 <Route path='/&/auth' element={<Auth />} />
 
-                <Route path='/&' element={<Container element={Main} />} />
+                <Route path='/&' element={<Container element={Dashboard} />} />
                 <Route path='/&/file' element={<Container element={FileSwitch} forceFullscreen />} />
 
                 <Route path='/&/config' element={<Container element={Config} />} />

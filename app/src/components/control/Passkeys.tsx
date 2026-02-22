@@ -3,9 +3,9 @@ import { observer } from 'mobx-react-lite';
 
 import { startRegistration } from '@simplewebauthn/browser';
 
-import { Button } from '../../shadcn/button';
-import { Checkbox } from '@/components/shadcn/checkbox';
-import { Label } from '@/components/shadcn/label';
+import { Button } from '../ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Label } from '@/components/ui/label';
 
 import authManager from '@/managers/AuthManager';
 

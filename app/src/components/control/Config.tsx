@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react';
 import { observer } from 'mobx-react-lite';
 
-import { Button } from '@/components/shadcn/button';
-import { Checkbox } from '@/components/shadcn/checkbox';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/shadcn/dialog';
-import { Label } from '@/components/shadcn/label';
-import { Separator } from '@/components/shadcn/separator';
-import { Slider } from '@/components/shadcn/slider';
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/shadcn/tooltip';
+import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Label } from '@/components/ui/label';
+import { Separator } from '@/components/ui/separator';
+import { Slider } from '@/components/ui/slider';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import Github from 'lucide-react/icons/github';
 import KeyRound from 'lucide-react/icons/key-round';

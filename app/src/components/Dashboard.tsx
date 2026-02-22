@@ -16,7 +16,7 @@ const getTOD = () => {
     else return 'evening';
 }
 
-const Main = observer(function Main() {
+const Dashboard = observer(function Dashboard() {
     const navigate = useNavigate();
 
     const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening'>(getTOD());
@@ -47,4 +47,4 @@ const Main = observer(function Main() {
     )
 });
 
-export default Main;
+export default Dashboard;

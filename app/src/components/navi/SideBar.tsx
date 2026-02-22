@@ -7,10 +7,10 @@ import ChevronDown from 'lucide-react/icons/chevron-down';
 import FileLock from 'lucide-react/icons/file-lock';
 import Folder from 'lucide-react/icons/folder';
 
-import { Button } from '@/components/shadcn/button';
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '../../shadcn/context-menu';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/shadcn/dialog';
-import { Input } from '../../shadcn/input';
+import { Button } from '@/components/ui/button';
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '../ui/context-menu';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '../ui/input';
 
 import fileManager from '@/managers/FileManager';
 

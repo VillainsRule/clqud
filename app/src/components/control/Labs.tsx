@@ -1,7 +1,7 @@
 import { observer } from 'mobx-react-lite';
 
-import { Button } from '@/components/shadcn/button';
-import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/shadcn/select';
+import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 import labManager from '@/managers/LabManager';
 

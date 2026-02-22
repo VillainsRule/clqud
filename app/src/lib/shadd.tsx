@@ -1,8 +1,8 @@
 import { useState, useCallback } from 'react';
 
-import { Button } from '@/components/shadcn/button';
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/shadcn/dialog';
-import { Input } from '@/components/shadcn/input';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 
 type DialogType = 'alert' | 'confirm' | 'prompt';
 

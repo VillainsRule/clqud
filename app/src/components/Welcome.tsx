@@ -2,8 +2,8 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 
-import { Button } from '@/components/shadcn/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/shadcn/card'
+import { Button } from '@/components/ui/button'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 import authManager from '@/managers/AuthManager'
 

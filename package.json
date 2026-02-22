@@ -9,7 +9,7 @@
         "apidev": "cd api && DEV=1 bun --watch src/main.ts",
         "appdev": "cd app && bun watch.ts",
         "appdev2": "cd app && bunx --bun vite dev",
-        "addcn": "mv @/components/ui/* app/src/components/shadcn/ && rm -rf @/"
+        "addcn": "mv @/components/ui/* app/src/components/ui/ && rm -rf @/"
     },
     "dependencies": {
         "@elysiajs/eden": "^1.4.8",
