@@ -8,9 +8,9 @@ import FileLock from 'lucide-react/icons/file-lock';
 import Folder from 'lucide-react/icons/folder';
 
 import { Button } from '@/components/ui/button';
-import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '../ui/context-menu';
+import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator, ContextMenuTrigger } from '@/components/ui/context-menu';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Input } from '../ui/input';
+import { Input } from '@/components/ui/input';
 
 import fileManager from '@/managers/FileManager';
 

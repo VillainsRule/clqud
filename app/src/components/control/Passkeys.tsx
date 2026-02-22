@@ -3,7 +3,7 @@ import { observer } from 'mobx-react-lite';
 
 import { startRegistration } from '@simplewebauthn/browser';
 
-import { Button } from '../ui/button';
+import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 

@@ -48,7 +48,7 @@ export const codeExtensions = [
     'asm', 's', 'S', 'diff'
 ]
 
-export const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'ico', 'heic', 'tiff'];
+export const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'webp', 'svg', 'ico'];
 export const videoExtensions = ['mp4', 'mkv', 'avi', 'mov', 'webm'];
 export const audioExtensions = ['mp3', 'wav', 'ogg', 'flac'];
 
