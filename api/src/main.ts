@@ -39,6 +39,24 @@ for (const a of assets) serve.get(`/a/${a}`, () => {
 });
 
 const fileDir = path.join(import.meta.dirname, '..', 'files');
+if (!fs.existsSync(fileDir)) fs.mkdirSync(fileDir);
+
+const scanForSymlinks = (dir: string, baseDir: string = dir) => {
+    try {
+        const entries = fs.readdirSync(dir, { withFileTypes: true });
+        for (const entry of entries) {
+            const fullPath = path.join(dir, entry.name);
+            if (entry.isSymbolicLink()) {
+                console.warn(`symlink removed (this is BAD): ${path.relative(baseDir, fullPath)}`);
+                fs.unlinkSync(fullPath);
+            } else if (entry.isDirectory()) scanForSymlinks(fullPath, baseDir);
+        }
+    } catch (error) {
+        console.warn(`Failed to scan directory ${dir}:`, error);
+    }
+};
+
+scanForSymlinks(fileDir);
 
 const serveAsTxt = ['diff'];
 
