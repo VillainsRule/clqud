@@ -1,0 +1,19 @@
+<div align='center'>
+    <h1>clqud</h1>
+    <h3>a simple file hosting solution meant for...yourself!</h3>
+</div>
+
+<br><br>
+
+<h2 align='center'>Setup</h2>
+
+1. Install [Bun](https://bun.sh)
+2. Clone the repo: `git clone https://github.com/VillainsRule/clqud && cd clqud`
+3. Prepare for production: `bun prep`
+4. Start the production server: `bun start`
+
+> [!WARNING]
+> If not using Bun, some features may not work as intended.
+
+<br><br>
+<h5 align='center'>made with ❤️ by <b>VillainsRule</b></h5>
