@@ -46,7 +46,11 @@ interface FileTreeItemProps {
 }
 
 const validateName = (input: string, nodeType: 'folder' | 'file'): boolean => {
+    const parts = input.split('/');
+
     if (!input.trim()) return false;
+    else if (input.includes(' ')) return false;
+    else if (parts[parts.length - 1].startsWith('.')) return false;
     else if (input.endsWith('.auth') || input.endsWith('.')) return false;
     else if (nodeType === 'folder' && input.includes('.')) return false;
     else if (nodeType === 'file' && input.includes('..')) return false;

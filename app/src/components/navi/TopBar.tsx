@@ -223,28 +223,32 @@ const TopBar = observer(function TopBar() {
                         <TooltipTrigger asChild>
                             <Fingerprint className='w-6 h-6 cursor-pointer text-accent-foreground' onClick={() => navigate('/&/passkeys')} />
                         </TooltipTrigger>
-                        <TooltipContent><span>Passkeys</span></TooltipContent>
+
+                        <TooltipContent>Passkeys</TooltipContent>
                     </Tooltip>}
 
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <Wrench className='w-6 h-6 cursor-pointer text-accent-foreground' onClick={() => navigate('/&/config')} />
                         </TooltipTrigger>
-                        <TooltipContent><span>Instance Config</span></TooltipContent>
+
+                        <TooltipContent>Instance Config</TooltipContent>
                     </Tooltip>
 
                     {authManager.isDev && <Tooltip>
                         <TooltipTrigger asChild>
                             <Flask className='w-5.75 h-5.75 rotate-7 -mx-0.5 cursor-pointer text-accent-foreground' onClick={() => navigate('/&/labs')} />
                         </TooltipTrigger>
-                        <TooltipContent><span>Labs</span></TooltipContent>
+
+                        <TooltipContent>Labs</TooltipContent>
                     </Tooltip>}
 
                     <Tooltip>
                         <TooltipTrigger asChild>
                             <LogOut className='w-6 h-6 cursor-pointer text-red-500' onClick={() => authManager.logout()} />
                         </TooltipTrigger>
-                        <TooltipContent><span>Log Out</span></TooltipContent>
+
+                        <TooltipContent>Log Out</TooltipContent>
                     </Tooltip>
                 </div>
             </div>

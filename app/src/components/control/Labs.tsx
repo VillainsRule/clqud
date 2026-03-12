@@ -7,7 +7,7 @@ import labManager from '@/managers/LabManager';
 
 const Labs = observer(function Labs() {
     return (
-        <div className='flex flex-col justify-center gap-5 w-5/6 mt-5'>
+        <div className='flex flex-col justify-center gap-5 w-5/6'>
             {Object.entries(labManager.experiments).map(([name]) => {
                 const value = labManager.get(name);
 

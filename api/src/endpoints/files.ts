@@ -12,8 +12,17 @@ import { getNameExt } from '../../../shared/pathUtil';
 const fileDir = path.join(import.meta.dirname, '..', '..', 'files');
 const glob = new Bun.Glob('**/*');
 
-const validateName = (input: string, nodeType: 'folder' | 'file') =>
-    !input.endsWith('.') && !(nodeType === 'folder' && input.includes('.'));
+const validatePath = (input: string, nodeType: 'folder' | 'file') => {
+    const ne = getNameExt(input);
+
+    if (!input.trim()) return false;
+    else if (input.includes(' ')) return false;
+    else if (ne.startsWith('.') || input.startsWith('.')) return false;
+    else if (input.endsWith('.auth') || input.endsWith('.')) return false;
+    else if (nodeType === 'folder' && input.includes('.')) return false;
+    else if (nodeType === 'file' && input.includes('..')) return false;
+    else return true;
+}
 
 const files = new Elysia({ name: 'files' })
     .get('/api/file/tree', async ({ cookie: { session } }) => {
@@ -113,7 +122,7 @@ const files = new Elysia({ name: 'files' })
         if (oldPath.includes('.DS_Store') || newPath.includes('DS_Store')) return status(400, { error: 'invalid file path' });
 
         const ne = getNameExt(newPath);
-        if (!validateName(ne, body.newPath.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
+        if (!validatePath(ne, body.newPath.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
 
         if (!fs.existsSync(oldPath)) return status(400, { error: 'file does not exist' });
         if (fs.existsSync(newPath)) return status(400, { error: 'new file already exists' });
@@ -130,10 +139,9 @@ const files = new Elysia({ name: 'files' })
         const filePath = path.join(fileDir, body.path);
         if (!filePath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
         if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
-        if (fs.existsSync(filePath)) return status(400, { error: 'file already exists' });
 
-        const ne = getNameExt(filePath);
-        if (!validateName(ne, body.type)) return status(400, { error: 'invalid file path' });
+        if (!validatePath(filePath, body.type)) return status(400, { error: 'invalid file path' });
+        if (fs.existsSync(filePath)) return status(400, { error: 'file already exists' });
 
         if (body.type === 'folder') {
             fs.mkdirSync(filePath);
@@ -153,7 +161,7 @@ const files = new Elysia({ name: 'files' })
         if (!fs.existsSync(filePath)) return status(400, { error: 'file does not exist' });
 
         const ne = getNameExt(filePath);
-        if (!validateName(ne, body.path.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
+        if (!validatePath(ne, body.path.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
 
         if (fs.statSync(filePath).isDirectory()) fs.rmSync(filePath, { recursive: true });
         else fs.unlinkSync(filePath);
@@ -170,7 +178,7 @@ const files = new Elysia({ name: 'files' })
         if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
 
         const ne = getNameExt(filePath);
-        if (!validateName(ne, body.path.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
+        if (!validatePath(ne, body.path.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
 
         if (!fs.existsSync(filePath)) return status(400, { error: 'file does not exist' });
 
@@ -197,7 +205,7 @@ const files = new Elysia({ name: 'files' })
             if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
 
             const ne = getNameExt(filePath);
-            if (!validateName(ne, paths[i].includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
+            if (!validatePath(ne, paths[i].includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
 
             const dirPath = path.dirname(filePath);
             if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
@@ -220,7 +228,7 @@ const files = new Elysia({ name: 'files' })
         if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
 
         const ne = getNameExt(filePath);
-        if (!validateName(ne, body.path.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
+        if (!validatePath(ne, body.path.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
 
         if (!fs.existsSync(filePath)) return status(400, { error: 'file does not exist' });
 
@@ -239,7 +247,7 @@ const files = new Elysia({ name: 'files' })
         if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
 
         const ne = getNameExt(filePath);
-        if (!validateName(ne, body.path.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
+        if (!validatePath(ne, body.path.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
 
         if (!fs.existsSync(filePath)) return status(400, { error: 'file does not exist' });
 

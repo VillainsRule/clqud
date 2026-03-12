@@ -48,7 +48,7 @@ const Passkeys = observer(function Passkeys() {
     );
 
     return (
-        <div className='flex flex-col items-center w-full h-full md:w-5/6 gap-5 overflow-y-auto custom-scrollbar mt-6'>
+        <div className='flex flex-col items-center w-full h-full md:w-5/6 gap-5 overflow-y-auto custom-scrollbar'>
             <div className='flex justify-between items-center gap-3 md:gap-0 w-full flex-col md:flex-row'>
                 <h2 className='text-2xl font-bold'>passkey manager</h2>
 

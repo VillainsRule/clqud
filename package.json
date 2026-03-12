@@ -1,6 +1,5 @@
 {
     "name": "clqud",
-    "main": "api/src/main.ts",
     "scripts": {
         "start": "cd api && bun src/main.ts",
         "prep": "bun install && cd app && bunx --bun vite build",
