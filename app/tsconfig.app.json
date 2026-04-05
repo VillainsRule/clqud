@@ -23,7 +23,6 @@
         "noFallthroughCasesInSwitch": true,
         "noUncheckedSideEffectImports": true,
 
-        "baseUrl": ".",
         "paths": {
             "@/types": ["../shared/types.d.ts"],
             "@/shared/*": ["../shared/*"],

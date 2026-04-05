@@ -6,7 +6,6 @@
         { "path": "../api/tsconfig.json" }
     ],
     "compilerOptions": {
-        "baseUrl": ".",
         "paths": {
             "@/types": ["../shared/types.d.ts"],
             "@/shared/*": ["../shared/*"],
