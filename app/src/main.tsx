@@ -6,12 +6,10 @@ import { observer } from 'mobx-react-lite'
 import { Editor } from '@monaco-editor/react'
 
 import { Button } from './components/ui/button'
-import { Input } from './components/ui/input'
 
 import authManager from './managers/AuthManager'
 import fileManager from './managers/FileManager'
 
-import Auth from './components/Auth'
 import Unlock from './components/Unlock'
 import Welcome from './components/Welcome'
 
@@ -19,13 +17,10 @@ import Dashboard from './components/Dashboard'
 import SideBar from './components/navi/SideBar'
 import TopBar from './components/navi/TopBar'
 
-import Config from './components/control/Config'
-import Labs from './components/control/Labs'
-import Passkeys from './components/control/Passkeys'
+import Config from './components/Config'
 
 import FileSwitch from './components/file/Switch'
 
-import api, { errorFrom } from './lib/eden'
 import { ShaddProvider } from './lib/shadd'
 
 import './index.css'
@@ -136,30 +131,17 @@ const App = observer(function App() {
 
     return authManager.hasInit ? (authManager.locked ? <div className='flex flex-col justify-center items-center text-center px-6 gap-2 h-screen w-screen'>
         <h1 className='text-4xl font-extrabold tracking-tight text-primary drop-shadow-sm'>clqud</h1>
-        <h2>is currently locked. you can unlock it with the instance password:</h2>
+        <h2>is locked. you can unlock it by confirming through voauth:</h2>
 
-        <div className='flex gap-3 min-w-fit mt-1'>
-            <Input type='password' placeholder='instance password' id='unlockPassword' />
-            <Button onClick={() => {
-                const pwInput = document.getElementById('unlockPassword') as HTMLInputElement;
-                if (pwInput.value) api.admin.instance.unlock.post({ password: pwInput.value }).then((res) => {
-                    if (res.data) location.reload();
-                    else alert(errorFrom(res));
-                });
-            }}>unlock instance</Button>
-        </div>
+        <Button className='mt-1' onClick={() => location.href = authManager.redirect.replace('ACTION', 'unlock')}>confirm with voauth</Button>
     </div> : <>
         <div className='hidden md:block'><BrowserRouter>
             <Routes>
                 <Route path='/' element={<Welcome />} />
-                <Route path='/&/auth' element={<Auth />} />
 
                 <Route path='/&' element={<Container element={Dashboard} />} />
                 <Route path='/&/file' element={<Container element={FileSwitch} forceFullscreen />} />
-
                 <Route path='/&/config' element={<Container element={Config} />} />
-                <Route path='/&/labs' element={<Container element={Labs} />} />
-                <Route path='/&/passkeys' element={<Container element={Passkeys} />} />
 
                 <Route path='*' element={<div className='flex flex-col justify-center items-center gap-2 h-screen w-screen'>
                     <h1 className='text-4xl font-extrabold tracking-tight text-primary drop-shadow-sm'>clqud</h1>
@@ -171,20 +153,9 @@ const App = observer(function App() {
         <div className='md:hidden flex flex-col justify-center items-center text-center px-6 gap-2 h-screen w-screen'>
             <h1 className='text-4xl font-extrabold tracking-tight text-primary drop-shadow-sm'>clqud</h1>
             <h2>unfortunately does not support mobile at the moment. future goals?</h2>
-            <h2>however, in the event of an emergency, you may need to lock and unlock the instance. you can use the instance password to do so below:</h2>
+            <h2>however, in the event of an emergency, you may need to lock the instance. you can confirm with voauth to do that below:</h2>
 
-            <div className='flex gap-3 min-w-fit mt-1'>
-                <Input type='password' placeholder='instance password' id='lockPassword' />
-                <Button onClick={() => {
-                    const pwInput = document.getElementById('lockPassword') as HTMLInputElement;
-                    if (!pwInput.value) return;
-
-                    api.admin.instance.lockMobile.post({ password: pwInput.value }).then((res) => {
-                        if (res.data) location.reload();
-                        else alert(errorFrom(res));
-                    });
-                }}>lock instance</Button>
-            </div>
+            <Button className='mt-1' onClick={() => location.href = authManager.redirect.replace('ACTION', 'lock')}>lock instance</Button>
         </div>
     </>) : <div className='flex flex-col justify-center items-center text-center px-6 gap-2 h-screen w-screen'>
         <h1 className='text-4xl font-extrabold tracking-tight text-primary drop-shadow-sm'>clqud</h1>

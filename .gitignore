@@ -3,7 +3,6 @@ node_modules
 bun.lock
 
 # protected
-api/cert
 api/db
 api/files
 .env

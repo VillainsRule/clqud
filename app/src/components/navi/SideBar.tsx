@@ -248,7 +248,7 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
                                 <span className='min-w-4' />
                                 <span className='min-w-4'>{getFileIcon(inferredExtension)}</span>
                             </>)}
-                            <span className='overflow-ellipsis whitespace-nowrap'>{node.name}</span>
+                            <span className='text-ellipsis whitespace-nowrap'>{node.name}</span>
                         </span>
 
                         {node.type === 'file' && node.locked && <FileLock className='min-w-4 max-w-4' />}

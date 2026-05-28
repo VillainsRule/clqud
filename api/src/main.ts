@@ -1,7 +1,6 @@
 import { Elysia, t } from 'elysia';
 
 import fs from 'node:fs';
-import os from 'node:os';
 import path from 'node:path';
 
 import admin from './endpoints/admin';
@@ -11,21 +10,6 @@ import files from './endpoints/files';
 import { getExt, getNameExt } from '../../shared/pathUtil';
 
 const serve = new Elysia({ name: 'serve' });
-
-if (Bun.env.DEV === '1') serve.onRequest(({ set, request }) => {
-    set.headers['access-control-allow-origin'] = request.headers.get('Origin') || '*';
-    set.headers.vary = '*';
-
-    if (request.method === 'OPTIONS') {
-        set.headers['access-control-allow-methods'] = '*';
-        set.headers['access-control-allow-headers'] = '*';
-        return new Response(null, { status: 204 });
-    }
-
-    set.headers['access-control-allow-methods'] = request.method;
-
-    return;
-});
 
 const distDir = path.resolve(import.meta.dirname, '../../app/dist');
 const cachedIndex = Bun.file(path.join(distDir, 'index.html'));
@@ -59,9 +43,6 @@ const scanForSymlinks = (dir: string, baseDir: string = dir) => {
 scanForSymlinks(fileDir);
 
 const serveAsTxt = ['diff'];
-
-const certDir = path.join(import.meta.dirname, '..', 'cert');
-const certExists = fs.existsSync(certDir);
 
 const app = new Elysia()
     .get('/', () => new Response(cachedIndex))
@@ -115,14 +96,6 @@ const app = new Elysia()
     .use(admin)
     .use(auth)
     .use(files)
-    .listen(4456, () => console.log(`in the clquds... ${Bun.env.RP_ID !== 'localhost' ? `https://${Bun.env.RP_ID}` : 'http://localhost:4456'}`));
-
-if (certExists) app.listen({
-    port: 4457,
-    tls: {
-        cert: fs.readFileSync(path.join(certDir, 'cert.pem')),
-        key: fs.readFileSync(path.join(certDir, 'cert-key.pem'))
-    }
-}, () => console.log(`your self-signed cert is on https://${os.hostname()}.local:4457`))
+    .listen(4456, () => console.log('in the clquds... http://localhost:4456'));
 
 export type App = typeof app;

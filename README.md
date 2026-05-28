@@ -9,8 +9,9 @@
 
 1. Install [Bun](https://bun.sh)
 2. Clone the repo: `git clone https://github.com/VillainsRule/clqud && cd clqud`
-3. Prepare for production: `bun prep`
-4. Start the production server: `bun start`
+3. Setup authentication: `bun setup`
+4. Prepare for production: `bun prep`
+5. Start the production server: `bun start`
 
 > [!WARNING]
 > If not using Bun, some features may not work as intended.

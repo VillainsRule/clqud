@@ -2,7 +2,7 @@ import { clsx, type ClassValue } from 'clsx'
 import { twMerge } from 'tailwind-merge'
 
 import File from 'lucide-react/icons/file';
-import FileBraces from 'lucide-react/icons/file-braces.js';
+import FileBraces from 'lucide-react/icons/file-braces';
 import FileCode from 'lucide-react/icons/file-code';
 import FileDiff from 'lucide-react/icons/file-diff';
 import FileImage from 'lucide-react/icons/file-image';

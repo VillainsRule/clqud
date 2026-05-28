@@ -1,12 +1,6 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
-import Fingerprint from 'lucide-react/icons/fingerprint-pattern';
-import LogOut from 'lucide-react/icons/log-out';
-import Wrench from 'lucide-react/icons/wrench';
-
-import authManager from '@/managers/AuthManager';
 import fileManager from '@/managers/FileManager';
 
 const getTOD = () => {
@@ -17,8 +11,6 @@ const getTOD = () => {
 }
 
 const Dashboard = observer(function Dashboard() {
-    const navigate = useNavigate();
-
     const [timeOfDay, setTimeOfDay] = useState<'morning' | 'afternoon' | 'evening'>(getTOD());
 
     useEffect(() => {
@@ -36,12 +28,6 @@ const Dashboard = observer(function Dashboard() {
                     <h1 className='text-4xl font-bold mb-1.5'>good {timeOfDay}, admin!</h1>
                     <h3 className='text-2xl font-medium'>clqud has {fileManager.numFiles} files totaling {fileManager.size}</h3>
                 </div>
-            </div>
-
-            <div className='flex md:hidden flex-row gap-4 min-w-fit mt-2'>
-                {authManager.webAuthnEnabled && <Fingerprint className='w-8 h-8 cursor-pointer text-accent-foreground' onClick={() => navigate('/user/passkeys')} />}
-                {<Wrench className='w-8 h-8 cursor-pointer text-accent-foreground' onClick={() => navigate('/admin/config')} />}
-                <LogOut className='w-8 h-8 cursor-pointer text-red-500' onClick={() => authManager.logout()} />
             </div>
         </div>
     )

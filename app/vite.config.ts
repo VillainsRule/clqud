@@ -5,8 +5,6 @@ import path from 'node:path'
 import react from '@vitejs/plugin-react'
 import tailwindcss from '@tailwindcss/vite'
 
-const doAbsolute = 'ABSOLUTE' in Bun.env;
-
 // https://vite.dev/config/
 export default defineConfig({
     plugins: [react(), tailwindcss()],
@@ -32,9 +30,9 @@ export default defineConfig({
         target: 'esnext',
         rollupOptions: {
             output: {
-                chunkFileNames: doAbsolute ? 'a/[name].js' : 'a/[hash].[name].js',
-                entryFileNames: doAbsolute ? 'a/[name].js' : 'a/[hash].[name].js',
-                assetFileNames: doAbsolute ? 'a/[name][extname]' : 'a/[hash].[name][extname]'
+                chunkFileNames: 'a/[name].js',
+                entryFileNames: 'a/[name].js',
+                assetFileNames: 'a/[name][extname]'
             }
         },
         chunkSizeWarningLimit: 750

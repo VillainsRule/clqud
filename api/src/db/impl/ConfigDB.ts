@@ -1,7 +1,5 @@
 import BasicDB from '../BasicDB';
 
-import Hasher from '../../util/hasher';
-
 import { DBConfig } from '../../../../shared/types';
 
 export class ConfigDB extends BasicDB<DBConfig> {
@@ -10,7 +8,7 @@ export class ConfigDB extends BasicDB<DBConfig> {
     }
 
     initializeData() {
-        this.db = { password: Hasher.encode('admin'), locked: false, maxSizeMB: 100 };
+        this.db = { locked: false, maxSizeMB: 100 };
     }
 
     updateConfig(newConfig: Partial<DBConfig>) {

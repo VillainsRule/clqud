@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
@@ -6,16 +6,10 @@ import { ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuSeparator,
 import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import ChevronRight from 'lucide-react/icons/chevron-right';
-import Fingerprint from 'lucide-react/icons/fingerprint-pattern';
-import Flask from 'lucide-react/icons/flask-conical';
 import LogOut from 'lucide-react/icons/log-out';
-import Moon from 'lucide-react/icons/moon';
-import Sun from 'lucide-react/icons/sun';
 import Wrench from 'lucide-react/icons/wrench';
 import X from 'lucide-react/icons/x';
 
-import authManager from '@/managers/AuthManager';
-import labManager from '@/managers/LabManager';
 import fileManager from '@/managers/FileManager';
 
 import { getExt, getNameExt } from '@/shared/pathUtil';
@@ -26,7 +20,6 @@ import api from '@/lib/eden';
 const TopBar = observer(function TopBar() {
     const navigate = useNavigate();
 
-    const [dark, setDark] = useState<boolean>(false);
     const fileBarRef = useRef<HTMLDivElement>(null);
 
     const drag = useRef<{
@@ -36,13 +29,6 @@ const TopBar = observer(function TopBar() {
         indicatorEl: HTMLElement | null;
         originIndex: number;
     } | null>(null);
-
-    useEffect(() => {
-        if (localStorage.getItem('dark')) {
-            document.body.classList.add('dark');
-            setDark(true);
-        }
-    }, []);
 
     useEffect(() => {
         if (!fileBarRef.current || !fileManager.currentFilePath) return;
@@ -206,51 +192,21 @@ const TopBar = observer(function TopBar() {
             <h1 className='font-semibold text-lg'>welcome, admin!</h1>
 
             <div className='flex items-center gap-6 min-h-full'>
-                {labManager.get('darkMode') && <div className='flex items-center gap-6'>
-                    {dark ? <Sun className='w-6 h-6 cursor-pointer text-accent-foreground' onClick={() => {
-                        document.body.classList.remove('dark');
-                        localStorage.removeItem('dark');
-                        setDark(false);
-                    }} /> : <Moon className='w-6 h-6 cursor-pointer text-accent-foreground' onClick={() => {
-                        document.body.classList.add('dark');
-                        localStorage.setItem('dark', '1');
-                        setDark(true);
-                    }} />}
-                </div>}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <Wrench className='w-6 h-6 cursor-pointer text-accent-foreground' onClick={() => navigate('/&/config')} />
+                    </TooltipTrigger>
 
-                <div className='flex items-center gap-6'>
-                    {authManager.webAuthnEnabled && <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Fingerprint className='w-6 h-6 cursor-pointer text-accent-foreground' onClick={() => navigate('/&/passkeys')} />
-                        </TooltipTrigger>
+                    <TooltipContent>Instance Config</TooltipContent>
+                </Tooltip>
 
-                        <TooltipContent>Passkeys</TooltipContent>
-                    </Tooltip>}
+                <Tooltip>
+                    <TooltipTrigger asChild>
+                        <LogOut className='w-6 h-6 cursor-pointer text-red-500' onClick={() => api.auth.logout.post().then(() => location.reload())} />
+                    </TooltipTrigger>
 
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Wrench className='w-6 h-6 cursor-pointer text-accent-foreground' onClick={() => navigate('/&/config')} />
-                        </TooltipTrigger>
-
-                        <TooltipContent>Instance Config</TooltipContent>
-                    </Tooltip>
-
-                    {authManager.isDev && <Tooltip>
-                        <TooltipTrigger asChild>
-                            <Flask className='w-5.75 h-5.75 rotate-7 -mx-0.5 cursor-pointer text-accent-foreground' onClick={() => navigate('/&/labs')} />
-                        </TooltipTrigger>
-
-                        <TooltipContent>Labs</TooltipContent>
-                    </Tooltip>}
-
-                    <Tooltip>
-                        <TooltipTrigger asChild>
-                            <LogOut className='w-6 h-6 cursor-pointer text-red-500' onClick={() => authManager.logout()} />
-                        </TooltipTrigger>
-
-                        <TooltipContent>Log Out</TooltipContent>
-                    </Tooltip>
-                </div>
+                    <TooltipContent>Log Out</TooltipContent>
+                </Tooltip>
             </div>
         </div>
 
