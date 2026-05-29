@@ -65,14 +65,17 @@ class FileManager {
         if (this.currentFilePath === oldPath) this.currentFilePath = newPath;
     }
 
-    async uploadFiles(files: FileList | File[], targetPath: string) {
+    async uploadFiles(files: FileList | File[], targetPath: string, useRelativePath = false) {
         const formData = new FormData();
         formData.append('files', new File([], '_forceArray.txt'));
         formData.append('paths', '');
 
         for (const file of files) {
+            const relativePath = useRelativePath && (file as any).webkitRelativePath
+                ? (file as any).webkitRelativePath
+                : file.name;
             formData.append('files', file);
-            formData.append('paths', targetPath === '/' ? `/${file.name}` : `${targetPath}/${file.name}`);
+            formData.append('paths', targetPath === '/' ? `/${relativePath}` : `${targetPath}/${relativePath}`);
         }
 
         await fetch('/api/file/upload', { method: 'POST', body: formData });

@@ -35,6 +35,7 @@ export default defineConfig({
                 assetFileNames: 'a/[name][extname]'
             }
         },
+        emptyOutDir: true,
         chunkSizeWarningLimit: 750
     }
 })

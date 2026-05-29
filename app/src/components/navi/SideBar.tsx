@@ -269,6 +269,17 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
                         };
                         input.click();
                     }}>Upload File(s)</ContextMenuItem>
+                    <ContextMenuItem onClick={() => {
+                        const input = document.createElement('input');
+                        input.type = 'file';
+                        input.webkitdirectory = true;
+                        input.onchange = () => {
+                            if (!input.files) return;
+                            setIsExpanded(true);
+                            fileManager.uploadFiles(input.files, node.fullPath, true);
+                        };
+                        input.click();
+                    }}>Upload Folder</ContextMenuItem>
                     <ContextMenuSeparator />
                     <ContextMenuItem onClick={() => navigator.clipboard.writeText(node.fullPath + '/')}>Copy Path</ContextMenuItem>
                     <ContextMenuSeparator />
