@@ -247,8 +247,11 @@ const TopBar = observer(function TopBar() {
                         <ContextMenuItem onClick={() => window.open(location.origin + file)}>Open in New Tab</ContextMenuItem>
                         <ContextMenuItem onClick={() => window.open(location.origin + file + '?d')}>Download</ContextMenuItem>
                         {codeExtensions.includes(getExt(file)) && <ContextMenuItem onClick={async () => {
-                            const req = await api.file.pull.contents.post({ path: file });
-                            if (req.data) navigator.clipboard.writeText(req.data);
+                            fetch('/api/file/pull/contents', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ path: fileManager.currentFilePath })
+                            }).then(res => res.text()).then(text => navigator.clipboard.writeText(text)).catch(() => alert('failed to load file content'));
                         }}>Copy Contents</ContextMenuItem>}
                         <ContextMenuSeparator />
                         <ContextMenuItem onClick={() => navigator.clipboard.writeText(file)}>Copy Path</ContextMenuItem>

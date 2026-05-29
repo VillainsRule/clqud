@@ -90,7 +90,7 @@ const files = new Elysia({ name: 'files' })
         if (!fs.existsSync(filePath)) return status(400, { error: 'file does not exist' });
 
         const fileContents = fs.readFileSync(filePath, 'utf-8');
-        return fileContents;
+        return new Response(fileContents, { headers: { 'content-type': 'text/plain' } });
     }, { body: t.Object({ path: t.String() }), cookie: t.Object({ session: t.String() }) })
 
     .post('/api/file/edit', ({ body, cookie: { session } }) => {

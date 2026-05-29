@@ -297,8 +297,11 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
                     <ContextMenuItem onClick={() => window.open(location.origin + node.fullPath)}>Open in New Tab</ContextMenuItem>
                     <ContextMenuItem onClick={() => window.open(location.origin + node.fullPath + '?d')}>Download</ContextMenuItem>
                     {codeExtensions.includes(inferredExtension) && <ContextMenuItem onClick={async () => {
-                        const req = await api.file.pull.contents.post({ path: node.fullPath });
-                        if (req.data) navigator.clipboard.writeText(req.data);
+                        fetch('/api/file/pull/contents', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ path: fileManager.currentFilePath })
+                        }).then(res => res.text()).then(text => navigator.clipboard.writeText(text)).catch(() => alert('failed to load file content'));
                     }}>Copy Contents</ContextMenuItem>}
                     <ContextMenuSeparator />
                     <ContextMenuItem onClick={() => navigator.clipboard.writeText(node.fullPath)}>Copy Path</ContextMenuItem>
