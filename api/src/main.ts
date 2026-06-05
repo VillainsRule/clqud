@@ -3,6 +3,8 @@ import { Elysia, t } from 'elysia';
 import fs from 'node:fs';
 import path from 'node:path';
 
+import mime from 'mime/lite';
+
 import admin from './endpoints/admin';
 import auth from './endpoints/auth';
 import files from './endpoints/files';
@@ -12,15 +14,15 @@ import { getExt, getNameExt } from '../../shared/pathUtil';
 const serve = new Elysia({ name: 'serve' });
 
 const distDir = path.resolve(import.meta.dirname, '../../app/dist');
-const cachedIndex = Bun.file(path.join(distDir, 'index.html'));
+const cachedIndex = fs.readFileSync(path.join(distDir, 'index.html'), 'utf-8');
 
 const assetDir = path.join(distDir, 'a');
 const assets = fs.readdirSync(assetDir);
 
-for (const a of assets) serve.get(`/a/${a}`, () => {
-    const f = Bun.file(path.join(assetDir, a));
-    return new Response(f, { headers: { 'content-type': f.type } });
-});
+for (const a of assets) serve.get(`/a/${a}`, () => new Response(
+    fs.createReadStream(path.join(assetDir, a)),
+    { headers: { 'content-type': mime.getType(a) || 'application/octet-stream' } }
+));
 
 const fileDir = path.join(import.meta.dirname, '..', 'files');
 if (!fs.existsSync(fileDir)) fs.mkdirSync(fileDir);
@@ -45,8 +47,8 @@ scanForSymlinks(fileDir);
 const serveAsTxt = ['diff'];
 
 const app = new Elysia()
-    .get('/', () => new Response(cachedIndex))
-    .get('/&/*', () => new Response(cachedIndex))
+    .get('/', () => new Response(cachedIndex, { headers: { 'Content-Type': 'text/html' } }))
+    .get('/&/*', () => new Response(cachedIndex, { headers: { 'Content-Type': 'text/html' } }))
     .get('/*', ({ path: p, cookie: { cp }, query: { d, x } }) => {
         const requestedPath = path.join(fileDir, decodeURIComponent(p));
         if (requestedPath.endsWith('.auth') || requestedPath.endsWith('.DS_Store')) return new Response(null, { status: 404 });
@@ -76,10 +78,9 @@ const app = new Elysia()
                 }
             }
 
-            const f = Bun.file(requestedPath);
-            return new Response(f, {
+            return new Response(fs.createReadStream(requestedPath), {
                 headers: {
-                    'content-type': serveAsTxt.includes(getExt(requestedPath)) ? 'text/plain' : f.type,
+                    'content-type': serveAsTxt.includes(getExt(requestedPath)) ? 'text/plain' : (mime.getType(requestedPath) || 'application/octet-stream'),
                     'content-disposition': typeof d === 'string' ? `attachment; filename="${getNameExt(requestedPath)}` : 'inline'
                 }
             });
@@ -90,7 +91,7 @@ const app = new Elysia()
     .get('/favicon.ico', ({ set }) => {
         set.headers['Cache-Control'] = 'public, max-age=31536000, immutable, no-transform';
         set.headers['Content-Type'] = 'image/x-icon';
-        return Bun.file(path.join(distDir, 'favicon.ico'));
+        return new Response(fs.createReadStream(path.join(import.meta.dirname, 'ui', 'favicon.ico')), { headers: { 'Content-Type': 'image/x-icon' } });
     })
     .use(serve)
     .use(admin)

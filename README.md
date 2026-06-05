@@ -7,14 +7,11 @@
 
 <h2 align='center'>Setup</h2>
 
-1. Install [Bun](https://bun.sh)
+1. Install [Bun](https://bun.sh) (node also supported)
 2. Clone the repo: `git clone https://github.com/VillainsRule/clqud && cd clqud`
 3. Setup authentication: `bun setup`
 4. Prepare for production: `bun prep`
 5. Start the production server: `bun start`
-
-> [!WARNING]
-> If not using Bun, some features may not work as intended.
 
 <br><br>
 <h5 align='center'>made with ❤️ by <b>VillainsRule</b></h5>

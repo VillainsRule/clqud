@@ -10,7 +10,27 @@ import { FolderNode, TreeNode } from '../../../shared/types';
 import { getNameExt } from '../../../shared/pathUtil';
 
 const fileDir = path.join(import.meta.dirname, '..', '..', 'files');
-const glob = new Bun.Glob('**/*');
+
+const scanTree = (): Set<string> => {
+    if (typeof Bun !== 'undefined') {
+        const result = new Bun.Glob('**/*').scanSync({ cwd: fileDir, followSymlinks: false, dot: true });
+        return new Set(result);
+    } else {
+        const results: string[] = [];
+        const walk = (dir: string) => {
+            const entries = fs.readdirSync(dir, { withFileTypes: true });
+            for (const entry of entries) {
+                const full = path.join(dir, entry.name);
+                const rel = full.slice(fileDir.length + 1);
+                if (entry.isSymbolicLink()) continue;
+                results.push(rel);
+                if (entry.isDirectory()) walk(full);
+            }
+        };
+        walk(fileDir);
+        return new Set(results);
+    }
+}
 
 const validatePath = (input: string, nodeType: 'folder' | 'file') => {
     const ne = getNameExt(input);
@@ -35,7 +55,7 @@ const files = new Elysia({ name: 'files' })
             return status(500);
         }
 
-        const files = new Set(glob.scanSync({ cwd: fileDir, followSymlinks: false, dot: true }));
+        const files = scanTree();
         const fileTree: TreeNode = { name: '/', type: 'folder', fullPath: '', children: [] };
 
         files.forEach(e => {

@@ -14,7 +14,7 @@ class BasicDB<DBType> {
 
         if (!fs.existsSync(this.path)) {
             fs.mkdirSync(path.dirname(this.path), { recursive: true });
-            Bun.write(this.path, '');
+            fs.writeFileSync(this.path, '');
             this.initializeData();
             this.updateDB();
         } else alreadyExisted = true;
@@ -37,7 +37,7 @@ class BasicDB<DBType> {
     }
 
     updateDB() {
-        Bun.write(this.path, JSON.stringify(this.db));
+        fs.writeFileSync(this.path, JSON.stringify(this.db));
     }
 }
 

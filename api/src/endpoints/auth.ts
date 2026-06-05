@@ -14,7 +14,7 @@ const auth = new Elysia({ name: 'auth' })
             loggedIn,
             isLocked: configDB.db.locked,
             maxFileSize: loggedIn ? configDB.db.maxSizeMB : 0,
-            redirect: `${Bun.env.VOAUTH_HOST}/oauth/v1?client_id=${Bun.env.VOAUTH_CLIENT_ID}&redirect_uri=${encodeURIComponent(`${origin}/api/auth/ACTION/complete`)}`
+            redirect: `${process.env.VOAUTH_HOST}/oauth/v1?client_id=${process.env.VOAUTH_CLIENT_ID}&redirect_uri=${encodeURIComponent(`${origin}/api/auth/ACTION/complete`)}`
         }
     })
 
@@ -22,16 +22,16 @@ const auth = new Elysia({ name: 'auth' })
         try {
             if (!code) return status(400, { error: 'missing code' });
 
-            const userReq = await fetch(`${Bun.env.VOAUTH_HOST}/api/v1/oauth/validate`, {
+            const userReq = await fetch(`${process.env.VOAUTH_HOST}/api/v1/oauth/validate`, {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ appId: Bun.env.VOAUTH_CLIENT_ID, appSecret: Bun.env.VOAUTH_CLIENT_SECRET, code })
+                body: JSON.stringify({ appId: process.env.VOAUTH_CLIENT_ID, appSecret: process.env.VOAUTH_CLIENT_SECRET, code })
             });
 
             const userRes = await userReq.json() as { error: string } | { user: { id: number, username: string } };
             if (!('user' in userRes)) return status(401, { error: userRes.error || 'invalid code' });
 
-            if (userRes.user.id.toString() !== Bun.env.VOAUTH_USER_ID) return status(401, { error: 'your voauth account is not authorized to access this instance' });
+            if (userRes.user.id.toString() !== process.env.VOAUTH_USER_ID) return status(401, { error: 'your voauth account is not authorized to access this instance' });
 
             const newSession = crypto.randomBytes(32).toString('hex');
             sessionDB.add(newSession);
@@ -53,16 +53,16 @@ const auth = new Elysia({ name: 'auth' })
         try {
             if (!code) return status(400, { error: 'missing code' });
 
-            const userReq = await fetch(`${Bun.env.VOAUTH_HOST}/api/v1/oauth/validate`, {
+            const userReq = await fetch(`${process.env.VOAUTH_HOST}/api/v1/oauth/validate`, {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ appId: Bun.env.VOAUTH_CLIENT_ID, appSecret: Bun.env.VOAUTH_CLIENT_SECRET, code })
+                body: JSON.stringify({ appId: process.env.VOAUTH_CLIENT_ID, appSecret: process.env.VOAUTH_CLIENT_SECRET, code })
             });
 
             const userRes = await userReq.json() as { error: string } | { user: { id: number, username: string } };
             if (!('user' in userRes)) return status(401, { error: userRes.error || 'invalid code' });
 
-            if (userRes.user.id.toString() !== Bun.env.VOAUTH_USER_ID) return status(401, { error: 'your voauth account is not authorized to access this instance' });
+            if (userRes.user.id.toString() !== process.env.VOAUTH_USER_ID) return status(401, { error: 'your voauth account is not authorized to access this instance' });
 
             configDB.updateConfig({ locked: true });
 
@@ -77,16 +77,16 @@ const auth = new Elysia({ name: 'auth' })
         try {
             if (!code) return status(400, { error: 'missing code' });
 
-            const userReq = await fetch(`${Bun.env.VOAUTH_HOST}/api/v1/oauth/validate`, {
+            const userReq = await fetch(`${process.env.VOAUTH_HOST}/api/v1/oauth/validate`, {
                 method: 'POST',
                 headers: { 'content-type': 'application/json' },
-                body: JSON.stringify({ appId: Bun.env.VOAUTH_CLIENT_ID, appSecret: Bun.env.VOAUTH_CLIENT_SECRET, code })
+                body: JSON.stringify({ appId: process.env.VOAUTH_CLIENT_ID, appSecret: process.env.VOAUTH_CLIENT_SECRET, code })
             });
 
             const userRes = await userReq.json() as { error: string } | { user: { id: number, username: string } };
             if (!('user' in userRes)) return status(401, { error: userRes.error || 'invalid code' });
 
-            if (userRes.user.id.toString() !== Bun.env.VOAUTH_USER_ID) return status(401, { error: 'your voauth account is not authorized to access this instance' });
+            if (userRes.user.id.toString() !== process.env.VOAUTH_USER_ID) return status(401, { error: 'your voauth account is not authorized to access this instance' });
 
             configDB.updateConfig({ locked: false });
 
