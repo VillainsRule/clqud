@@ -31,11 +31,12 @@ const AssetViewer = observer(function AssetViewer() {
     }, [fileManager.currentFilePath]);
 
     return (
-        <>
+        <div className='w-full h-full flex items-center justify-center overflow-hidden'>
             {type === 'image' ? <img src={directLink} alt={fileManager.currentFilePath} className='max-h-full max-w-full object-contain' /> :
                 type === 'video' ? <video src={directLink} controls className='max-h-full max-w-full object-contain' /> :
-                    type === 'audio' ? <audio src={directLink} controls className='w-[50%] mt-5' /> : <>cannot preview this type of file</>}
-        </>
+                    type === 'audio' ? <audio src={directLink} controls className='w-[50%] mt-5' /> :
+                        <>cannot preview this type of file</>}
+        </div>
     )
 });
 

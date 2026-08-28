@@ -6,6 +6,11 @@ import configDB from '../db/impl/ConfigDB';
 import sessionDB from '../db/impl/SessionDB';
 
 const auth = new Elysia({ name: 'auth' })
+    .get('/&/auth', ({ request }) => {
+        const origin = new URL(request.url).origin;
+        return Response.redirect(`${process.env.VOAUTH_HOST}/oauth/v1?client_id=${process.env.VOAUTH_CLIENT_ID}&redirect_uri=${encodeURIComponent(`${origin}/api/auth/login/complete`)}`);
+    })
+
     .get('/api/auth/instance', async ({ cookie: { session }, request }) => {
         const origin = new URL(request.url).origin;
 

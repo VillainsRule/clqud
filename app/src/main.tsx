@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Route, Routes, useLocation, useNavigate } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, useLocation } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 
 import { Editor } from '@monaco-editor/react'
@@ -27,11 +27,10 @@ import './index.css'
 
 function Container({ element: Element, forceFullscreen }: { element: React.ComponentType<any>, forceFullscreen?: boolean }) {
     const location = useLocation();
-    const navigate = useNavigate();
     const dragCounterRef = useRef(0);
 
     useEffect(() => {
-        if (!location.pathname.includes('auth') && !authManager.loggedIn) navigate('/&/auth');
+        if (!location.pathname.includes('auth') && !authManager.loggedIn) window.location.href = '/&/auth';
     }, [authManager.loggedIn]);
 
     const [bodyDraggedOver, setBodyDraggedOver] = useState(false);
@@ -109,8 +108,7 @@ function Container({ element: Element, forceFullscreen }: { element: React.Compo
             >
                 <TopBar />
 
-                <div
-                    className={`flex flex-col items-center ${forceFullscreen && 'h-full'}`}>
+                <div className={`flex flex-col items-center ${forceFullscreen ? 'flex-1 min-h-0 w-full pb-4' : ''}`}>
                     <Element />
                     {bodyDraggedOver && <div className='w-full h-full absolute backdrop-blur-xs flex justify-center items-center text-xl'>drop to upload to /!</div>}
                 </div>
