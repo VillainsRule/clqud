@@ -45,7 +45,7 @@ const TopBar = observer(function TopBar() {
                 const isFile = i === fileManager.currentFilePath.split('/').length - 1;
                 return <>
                     {isFile && getFileIcon(getExt(part))}
-                    <div className={isFile ? 'ml-1.5' : ''}>{part === '' ? 'files' : part}</div>
+                    <div className={isFile ? 'ml-1.5' : ''}>{part === '' ? 'clqud' : part}</div>
                     {!isFile && <ChevronRight className='text-xs h-5' />}
                 </>
             })}

@@ -154,7 +154,7 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
 
     if (isRenaming) return (
         <div
-            className={'flex w-full items-center gap-1 py-1.5 px-3 text-md rounded-md transition-colors text-left bg-accent'}
+            className={'flex w-full items-center gap-2 py-1.5 px-3 text-md rounded-md transition-colors text-left bg-accent'}
             style={{ paddingLeft: `${level * 16 + 12}px` }}
         >
             <span className='min-w-4' />
@@ -172,7 +172,7 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
                 }}
                 onBlur={handleRename}
                 placeholder={node.type === 'folder' ? 'folder name' : 'file name'}
-                className={`h-6 text-md border-0 ring-0 focus-visible:ring-0 p-0 bg-transparent flex-1 ${!nameValid ? 'text-red-500' : ''}`}
+                className={`h-6 text-md border-0 rounded-none ring-0 focus-visible:ring-0 p-0 bg-transparent flex-1 ${!nameValid ? 'text-red-500' : ''} text-base leading-normal tracking-normal`}
             />
         </div>
     );
