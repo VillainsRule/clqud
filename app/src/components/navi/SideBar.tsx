@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
@@ -178,7 +178,10 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
     );
 
     return (<>
-        <div style={isDropTarget ? { outline: '2px solid var(--primary)', outlineOffset: '-2px', borderRadius: '6px' } : {}}>
+        <div
+            className={isDropTarget ? 'bg-primary/10 transition-colors' : 'transition-colors'}
+            style={isDropTarget ? { outline: '2px solid var(--primary)', outlineOffset: '-2px', borderRadius: '6px' } : {}}
+        >
             <ContextMenu>
                 <ContextMenuTrigger>
                     <button
@@ -409,8 +412,57 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
     </>);
 });
 
+const AUTOSCROLL_EDGE = 56;
+const AUTOSCROLL_MAX_SPEED = 18;
+
 const SideBar = observer(function SideBar() {
     const navigate = useNavigate();
+
+    const scrollRef = useRef<HTMLDivElement>(null);
+    const scrollSpeedRef = useRef(0);
+    const scrollFrameRef = useRef<number | null>(null);
+
+    const tick = () => {
+        const el = scrollRef.current;
+        if (el && scrollSpeedRef.current !== 0) el.scrollTop += scrollSpeedRef.current;
+
+        if (scrollSpeedRef.current !== 0) scrollFrameRef.current = requestAnimationFrame(tick);
+        else scrollFrameRef.current = null;
+    };
+
+    const updateAutoscroll = (clientY: number) => {
+        const el = scrollRef.current;
+        if (!el) return;
+
+        const rect = el.getBoundingClientRect();
+        const distFromTop = clientY - rect.top;
+        const distFromBottom = rect.bottom - clientY;
+
+        let speed = 0;
+        if (distFromTop >= 0 && distFromTop < AUTOSCROLL_EDGE) speed = -AUTOSCROLL_MAX_SPEED * ((AUTOSCROLL_EDGE - distFromTop) / AUTOSCROLL_EDGE) ** 2;
+        else if (distFromBottom >= 0 && distFromBottom < AUTOSCROLL_EDGE) speed = AUTOSCROLL_MAX_SPEED * ((AUTOSCROLL_EDGE - distFromBottom) / AUTOSCROLL_EDGE) ** 2;
+
+        scrollSpeedRef.current = speed;
+        if (speed !== 0 && scrollFrameRef.current === null) scrollFrameRef.current = requestAnimationFrame(tick);
+    };
+
+    const stopAutoscroll = () => {
+        scrollSpeedRef.current = 0;
+        if (scrollFrameRef.current !== null) {
+            cancelAnimationFrame(scrollFrameRef.current);
+            scrollFrameRef.current = null;
+        }
+    };
+
+    useEffect(() => {
+        window.addEventListener('dragend', stopAutoscroll);
+        window.addEventListener('drop', stopAutoscroll);
+        return () => {
+            window.removeEventListener('dragend', stopAutoscroll);
+            window.removeEventListener('drop', stopAutoscroll);
+            stopAutoscroll();
+        };
+    }, []);
 
     return (
         <div className='border-neutral-200 min-w-88 max-w-88 h-full hidden md:flex flex-col px-6 py-6 left-0 top-0 bottom-0 z-20'>
@@ -418,7 +470,13 @@ const SideBar = observer(function SideBar() {
                 <h1 className='text-4xl font-extrabold tracking-tight text-primary drop-shadow-sm'>clqud</h1>
             </div>
 
-            <div className='h-full w-full overflow-y-scroll custom-scrollbar pr-2'>
+            <div
+                ref={scrollRef}
+                className='h-full w-full overflow-y-scroll custom-scrollbar pr-2'
+                onDragOverCapture={(e) => (fileManager.isDraggingExternal || fileManager.internalDragPath) && updateAutoscroll(e.clientY)}
+                onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node)) stopAutoscroll(); }}
+                onDrop={stopAutoscroll}
+            >
                 <FileTreeItem node={fileManager.tree} level={0} />
             </div>
         </div>

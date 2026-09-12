@@ -226,6 +226,9 @@ const files = new Elysia({ name: 'files' })
             const ne = getNameExt(filePath);
             if (!validatePath(ne, paths[i].includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
 
+            if (fs.existsSync(filePath) && fs.statSync(filePath).isFile())
+                return status(400, { error: `file ${paths[i]} already exists` });
+
             const dirPath = path.dirname(filePath);
             if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
 

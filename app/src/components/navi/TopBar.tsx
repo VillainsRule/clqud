@@ -41,13 +41,13 @@ const TopBar = observer(function TopBar() {
         </div>
 
         <div className={fileManager.currentFilePath ? `hidden md:flex items-center pt-1 pb-5 text-sm` : 'hidden'}>
-            {fileManager.currentFilePath.split('/').map((part, i) => {
-                const isFile = i === fileManager.currentFilePath.split('/').length - 1;
-                return <>
+            {fileManager.currentFilePath.split('/').filter((part, i) => part !== '' || i === 0).map((part, i, segments) => {
+                const isFile = i === segments.length - 1;
+                return <div key={i} className='flex items-center'>
                     {isFile && getFileIcon(getExt(part))}
                     <div className={isFile ? 'ml-1.5' : ''}>{part === '' ? 'clqud' : part}</div>
                     {!isFile && <ChevronRight className='text-xs h-5' />}
-                </>
+                </div>
             })}
         </div>
     </>

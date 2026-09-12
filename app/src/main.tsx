@@ -20,6 +20,7 @@ import TopBar from './components/navi/TopBar'
 import Config from './components/Config'
 
 import FileSwitch from './components/file/Switch'
+import UploadQueue from './components/navi/UploadQueue'
 
 import { ShaddProvider } from './lib/shadd'
 
@@ -69,19 +70,7 @@ function Container({ element: Element, forceFullscreen }: { element: React.Compo
         fileManager.isDraggingExternal = false;
         fileManager.dragHoverPath = null;
 
-        const formData = new FormData();
-        formData.append('files', new File([], '_forceArray.txt'));
-        formData.append('paths', '');
-
-        for (const file of files) {
-            formData.append('files', file);
-            formData.append('paths', targetPath === '/' ? `/${file.name}` : `${targetPath}/${file.name}`);
-        }
-
-        fetch('/api/file/upload', {
-            method: 'POST',
-            body: formData
-        }).then(() => fileManager.fetchTree());
+        fileManager.uploadFiles(files, targetPath);
     };
 
     return (
@@ -113,6 +102,8 @@ function Container({ element: Element, forceFullscreen }: { element: React.Compo
                     {bodyDraggedOver && <div className='w-full h-full absolute backdrop-blur-xs flex justify-center items-center text-xl'>drop to upload to /!</div>}
                 </div>
             </div>
+
+            <UploadQueue />
         </div>
     )
 }
