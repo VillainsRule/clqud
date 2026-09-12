@@ -15,7 +15,7 @@ import Welcome from './components/Welcome'
 
 import Dashboard from './components/Dashboard'
 import SideBar from './components/navi/SideBar'
-import TopBar from './components/navi/TopBar'
+import TopBar, { Breadcrumb } from './components/navi/TopBar'
 
 import Config from './components/Config'
 
@@ -26,7 +26,7 @@ import { ShaddProvider } from './lib/shadd'
 
 import './index.css'
 
-function Container({ element: Element, forceFullscreen }: { element: React.ComponentType<any>, forceFullscreen?: boolean }) {
+function Container({ element: Element, isAsset }: { element: React.ComponentType<any>, isAsset?: boolean }) {
     const location = useLocation();
     const dragCounterRef = useRef(0);
 
@@ -75,7 +75,7 @@ function Container({ element: Element, forceFullscreen }: { element: React.Compo
 
     return (
         <div
-            className='flex gap-5 h-screen w-screen'
+            className='flex gap-4 h-screen w-screen p-5 bg-background'
             onDragEnter={handleDragEnter}
             onDragLeave={handleDragLeave}
             onDragOver={handleDragOver}
@@ -83,23 +83,31 @@ function Container({ element: Element, forceFullscreen }: { element: React.Compo
         >
             <div className='hidden'><Editor /></div>
 
-            <SideBar />
+            <div className='hidden md:block min-w-84 max-w-84 h-full bg-card border rounded-2xl shadow-lg overflow-hidden'>
+                <SideBar />
+            </div>
 
-            <div
-                className={`flex flex-col w-full h-full ${forceFullscreen && 'overflow-hidden'} pr-5`}
-                onDragEnter={(e: React.DragEvent) => e.dataTransfer.types.includes('Files') && setBodyDraggedOver(true)}
-                onDragLeave={(e: React.DragEvent) => {
-                    if (!e.dataTransfer.types.includes('Files')) return;
-                    dragCounterRef.current--;
-                    if (dragCounterRef.current === 0) setBodyDraggedOver(false);
-                }}
-                onDragOver={(e: React.DragEvent) => e.dataTransfer.types.includes('Files') && e.preventDefault()}
-            >
-                <TopBar />
+            <div className='flex flex-col w-full h-full gap-3 min-w-0'>
+                <div className='hidden md:block shrink-0 bg-card border rounded-2xl shadow-lg px-6 py-3'>
+                    <TopBar />
+                </div>
 
-                <div className={`flex flex-col items-center ${forceFullscreen ? 'flex-1 min-h-0 w-full pb-4' : ''}`}>
-                    <Element />
-                    {bodyDraggedOver && <div className='w-full h-full absolute backdrop-blur-xs flex justify-center items-center text-xl'>drop to upload to /!</div>}
+                <div
+                    className={`relative flex flex-col w-full flex-1 min-h-0 bg-card border rounded-2xl shadow-lg p-3 ${isAsset ? 'overflow-hidden' : 'overflow-y-auto custom-scrollbar'}`}
+                    onDragEnter={(e: React.DragEvent) => e.dataTransfer.types.includes('Files') && setBodyDraggedOver(true)}
+                    onDragLeave={(e: React.DragEvent) => {
+                        if (!e.dataTransfer.types.includes('Files')) return;
+                        dragCounterRef.current--;
+                        if (dragCounterRef.current === 0) setBodyDraggedOver(false);
+                    }}
+                    onDragOver={(e: React.DragEvent) => e.dataTransfer.types.includes('Files') && e.preventDefault()}
+                >
+                    {isAsset && <Breadcrumb />}
+
+                    <div className={`flex flex-col items-center w-full ${isAsset ? 'flex-1 min-h-0' : ''}`}>
+                        <Element />
+                        {bodyDraggedOver && <div className='absolute inset-0 backdrop-blur-xs flex justify-center items-center text-xl rounded-2xl'>drop to upload to /!</div>}
+                    </div>
                 </div>
             </div>
 
@@ -129,7 +137,7 @@ const App = observer(function App() {
                 <Route path='/' element={<Welcome />} />
 
                 <Route path='/&' element={<Container element={Dashboard} />} />
-                <Route path='/&/file' element={<Container element={FileSwitch} forceFullscreen />} />
+                <Route path='/&/file' element={<Container element={FileSwitch} isAsset />} />
                 <Route path='/&/config' element={<Container element={Config} />} />
 
                 <Route path='*' element={<div className='flex flex-col justify-center items-center gap-2 h-screen w-screen'>

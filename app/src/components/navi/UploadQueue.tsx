@@ -23,11 +23,11 @@ const UploadQueue = observer(function UploadQueue() {
                         </div>
                         <div className='h-1.5 w-full rounded-full bg-muted overflow-hidden'>
                             <div
-                                className={`h-full rounded-full transition-all duration-150 ${task.status === 'error' ? 'bg-red-500' : task.status === 'queued' ? 'bg-muted-foreground/40' : 'bg-primary'}`}
+                                className={`h-full rounded-full transition-all duration-150 ${task.status === 'error' ? 'bg-destructive' : task.status === 'queued' ? 'bg-muted-foreground/40' : 'bg-primary'}`}
                                 style={{ width: task.status === 'queued' ? '100%' : `${task.progress}%` }}
                             />
                         </div>
-                        {task.status === 'error' && task.error && <div className='text-xs text-red-500 mt-1.5 truncate' title={task.error}>{task.error}</div>}
+                        {task.status === 'error' && task.error && <div className='text-xs text-destructive mt-1.5 truncate' title={task.error}>{task.error}</div>}
                     </div>
                 ))}
             </div>

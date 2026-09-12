@@ -43,7 +43,7 @@
 
 :root {
     --radius: 0.625rem;
-    --background: lab(100% 0 0);
+    --background: lab(94.5% 0 0);
     --foreground: lab(2.75381% 0 0);
     --card: lab(100% 0 0);
     --card-foreground: lab(2.75381% 0 0);

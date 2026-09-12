@@ -30,7 +30,7 @@ export default function Unlock() {
                 }}>open file</Button>
             </div>
 
-            {error && <h2 className='text-red-500 mt-1'>{error}</h2>}
+            {error && <h2 className='text-destructive mt-1'>{error}</h2>}
 
             <h2 className='italic mt-1 text-xs text-muted-foreground'>for a permanent link, keep the ?x parameter once authorized</h2>
         </div>

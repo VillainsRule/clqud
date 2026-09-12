@@ -172,7 +172,7 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
                 }}
                 onBlur={handleRename}
                 placeholder={node.type === 'folder' ? 'folder name' : 'file name'}
-                className={`h-6 text-md border-0 rounded-none ring-0 focus-visible:ring-0 p-0 bg-transparent flex-1 ${!nameValid ? 'text-red-500' : ''} text-base leading-normal tracking-normal`}
+                className={`h-6 text-md border-0 rounded-none ring-0 focus-visible:ring-0 p-0 bg-transparent flex-1 ${!nameValid ? 'text-destructive' : ''} text-base leading-normal tracking-normal`}
             />
         </div>
     );
@@ -287,7 +287,7 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
                     <ContextMenuItem onClick={() => navigator.clipboard.writeText(node.fullPath + '/')}>Copy Path</ContextMenuItem>
                     <ContextMenuSeparator />
                     <ContextMenuItem onClick={() => startRenaming()}>Rename</ContextMenuItem>
-                    <ContextMenuItem className='text-red-500' onClick={() => {
+                    <ContextMenuItem className='text-destructive' onClick={() => {
                         shadd.confirm('delete folder', 'are you sure you want to delete this directory and EVERYTHING INSIDE? this CANNOT be undone!', () => {
                             api.file.delete.post({ path: node.fullPath }).then(() => {
                                 fileManager.fetchTree();
@@ -315,7 +315,7 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
                     </> : <ContextMenuItem onClick={() => setModifyingPassword('adding')}>Add Password</ContextMenuItem>}
                     <ContextMenuSeparator />
                     <ContextMenuItem onClick={() => startRenaming()}>Rename</ContextMenuItem>
-                    <ContextMenuItem className='text-red-500' onClick={() => {
+                    <ContextMenuItem className='text-destructive' onClick={() => {
                         shadd.confirm('delete file?', 'are you sure you want to delete this file? this CANNOT be undone!', () => {
                             api.file.delete.post({ path: node.fullPath }).then(() => {
                                 fileManager.fetchTree();
@@ -380,7 +380,7 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
                             }}
                             onBlur={handleCreateFile}
                             placeholder={fileManager.creatingType === 'folder' ? 'folder name' : 'file name'}
-                            className={`h-6 text-md border-0 ring-0 focus-visible:ring-0 p-0 bg-transparent flex-1 ${!nameValid ? 'text-red-500' : ''}`}
+                            className={`h-6 text-md border-0 ring-0 focus-visible:ring-0 p-0 bg-transparent flex-1 ${!nameValid ? 'text-destructive' : ''}`}
                         />
                     </div>
                 )}
@@ -465,7 +465,7 @@ const SideBar = observer(function SideBar() {
     }, []);
 
     return (
-        <div className='border-neutral-200 min-w-88 max-w-88 h-full hidden md:flex flex-col px-6 py-6 left-0 top-0 bottom-0 z-20'>
+        <div className='h-full w-full flex flex-col pl-3.25 pr-6 py-6'>
             <div className='flex justify-center cursor-pointer items-center w-full mb-4 select-none' onClick={() => navigate('/')}>
                 <h1 className='text-4xl font-extrabold tracking-tight text-primary drop-shadow-sm'>clqud</h1>
             </div>
