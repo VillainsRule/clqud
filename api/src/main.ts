@@ -49,7 +49,7 @@ const serveAsTxt = ['diff'];
 const app = new Elysia()
     .get('/', () => new Response(cachedIndex, { headers: { 'Content-Type': 'text/html' } }))
     .get('/&/*', () => new Response(cachedIndex, { headers: { 'Content-Type': 'text/html' } }))
-    .get('/*', ({ path: p, cookie: { cp }, query: { d, x } }) => {
+    .all('/*', ({ path: p, cookie: { cp }, query: { d, x } }) => {
         const requestedPath = path.join(fileDir, decodeURIComponent(p));
         if (requestedPath.endsWith('.auth') || requestedPath.endsWith('.DS_Store')) return new Response(null, { status: 404 });
 
