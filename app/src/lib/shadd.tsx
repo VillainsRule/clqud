@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef, useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -103,6 +103,9 @@ export function ShaddProvider() {
     const [state, setState] = useState<DialogState>(defaultState);
     const [inputValue, setInputValue] = useState('');
 
+    const inputRef = useRef<HTMLInputElement>(null);
+    const confirmRef = useRef<HTMLButtonElement>(null);
+
     _setState = useCallback((next: DialogState) => {
         setInputValue('');
         setState(next);
@@ -124,16 +127,32 @@ export function ShaddProvider() {
         state.onCancel?.();
     }, [close, state]);
 
+    useEffect(() => {
+        if (state.open && state.type === 'confirm') {
+            const id = setTimeout(() => {
+                const el = confirmRef.current;
+                if (!el) return;
+                el.focus({ preventScroll: true });
+                el.setAttribute('data-focus-visible', '');
+            }, 0);
+            return () => clearTimeout(id);
+        }
+    }, [state.open, state.type]);
+
     return (
         <Dialog open={state.open} onOpenChange={(open) => !open && handleCancel()}>
-            <DialogContent className='sm:max-w-lg gap-2'>
+            <DialogContent className='sm:max-w-lg gap-2' tabIndex={undefined} onOpenAutoFocus={(e) => {
+                e.preventDefault();
+                if (state.type === 'confirm') setTimeout(() => confirmRef.current?.focus({ focusVisible: true, preventScroll: true }), 0);
+                else if (state.type === 'prompt') setTimeout(() => inputRef.current?.focus({ focusVisible: true, preventScroll: true }), 0);
+            }}>
                 <DialogHeader>
                     <DialogTitle>{state.title}</DialogTitle>
                     {state.body && <DialogDescription>{state.body}</DialogDescription>}
                 </DialogHeader>
 
                 {state.type === 'prompt' && <div className='flex flex-col py-2 gap-2'>{state.inputs.map((input, idx) => <Input
-                    autoFocus
+                    ref={inputRef}
                     key={idx}
                     placeholder={input.placeholder}
                     minLength={input.minLength}
@@ -148,7 +167,7 @@ export function ShaddProvider() {
 
                     {state.type === 'confirm' && <>
                         <Button variant='outline' onClick={handleCancel}>Cancel</Button>
-                        <Button onClick={handleConfirm}>Confirm</Button>
+                        <Button variant='destructive' onClick={handleConfirm} ref={confirmRef}>Confirm</Button>
                     </>}
 
                     {state.type === 'prompt' && <>
@@ -157,7 +176,7 @@ export function ShaddProvider() {
                     </>}
                 </DialogFooter>
             </DialogContent>
-        </Dialog>
+        </ Dialog>
     );
 }
 

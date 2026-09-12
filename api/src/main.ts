@@ -48,6 +48,7 @@ const serveAsTxt = ['diff'];
 
 const app = new Elysia()
     .get('/', () => new Response(cachedIndex, { headers: { 'Content-Type': 'text/html' } }))
+    .get('/&', () => new Response(cachedIndex, { headers: { 'Content-Type': 'text/html' } }))
     .get('/&/*', () => new Response(cachedIndex, { headers: { 'Content-Type': 'text/html' } }))
     .all('/*', ({ path: p, cookie: { cp }, query: { d, x } }) => {
         const requestedPath = path.join(fileDir, decodeURIComponent(p));
@@ -91,7 +92,7 @@ const app = new Elysia()
     .get('/favicon.ico', ({ set }) => {
         set.headers['Cache-Control'] = 'public, max-age=31536000, immutable, no-transform';
         set.headers['Content-Type'] = 'image/x-icon';
-        return new Response(fs.createReadStream(path.join(import.meta.dirname, 'ui', 'favicon.ico')), { headers: { 'Content-Type': 'image/x-icon' } });
+        return new Response(fs.createReadStream(path.join(import.meta.dirname, '../../app/dist/favicon.ico')), { headers: { 'Content-Type': 'image/x-icon' } });
     })
     .use(serve)
     .use(admin)

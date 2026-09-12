@@ -8,7 +8,6 @@ import type { TreeNode } from '@/types';
 
 class FileManager {
     tree: TreeNode = { name: '/', fullPath: '/', type: 'folder', children: [] };
-    fileBar: string[] = [];
     fileHistory: string[] = [];
     size: string = '0 bytes';
 
@@ -48,7 +47,6 @@ class FileManager {
         await api.file.rename.post({ oldPath: draggedPath, newPath });
         await this.fetchTree();
 
-        this.fileBar = this.fileBar.map(e => e === draggedPath ? newPath : e);
         this.fileHistory = this.fileHistory.map(e => e === draggedPath ? newPath : e);
         if (this.currentFilePath === draggedPath) this.currentFilePath = newPath;
     }
@@ -60,7 +58,6 @@ class FileManager {
         await api.file.rename.post({ oldPath, newPath });
         await this.fetchTree();
 
-        this.fileBar = this.fileBar.map(e => e === oldPath ? newPath : e);
         this.fileHistory = this.fileHistory.map(e => e === oldPath ? newPath : e);
         if (this.currentFilePath === oldPath) this.currentFilePath = newPath;
     }
@@ -107,7 +104,6 @@ class FileManager {
         this.currentFilePath = file;
         this.currentFileContent = '';
 
-        if (!this.fileBar.includes(file)) this.fileBar.push(file);
         this.fileHistory.push(file);
     }
 }

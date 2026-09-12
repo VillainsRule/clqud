@@ -288,7 +288,6 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
                         shadd.confirm('delete folder', 'are you sure you want to delete this directory and EVERYTHING INSIDE? this CANNOT be undone!', () => {
                             api.file.delete.post({ path: node.fullPath }).then(() => {
                                 fileManager.fetchTree();
-                                fileManager.fileBar = fileManager.fileBar.filter(e => e !== node.fullPath);
                                 fileManager.fileHistory = fileManager.fileHistory.filter(e => e !== node.fullPath);
                             })
                         });
@@ -317,7 +316,6 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
                         shadd.confirm('delete file?', 'are you sure you want to delete this file? this CANNOT be undone!', () => {
                             api.file.delete.post({ path: node.fullPath }).then(() => {
                                 fileManager.fetchTree();
-                                fileManager.fileBar = fileManager.fileBar.filter(e => e !== node.fullPath);
                                 fileManager.fileHistory = fileManager.fileHistory.filter(e => e !== node.fullPath);
                                 if (fileManager.currentFilePath === node.fullPath) { fileManager.select(''); navigate('/&'); }
                             })

@@ -13,7 +13,7 @@ const Config = observer(function Config() {
     return (
         <div className='flex flex-col items-center w-5/6 gap-5 h-full overflow-y-auto'>
             <div className='flex justify-between flex-col text-center w-full'>
-                <h1 className='text-2xl text-center font-bold'>clqud not so secret management and config controls 🤯🤯🤯</h1>
+                <h1 className='text-2xl text-center font-bold'>clqud secret management and config controls 🤯🤯🤯</h1>
 
                 <h2 className='text-lg text-center font-medium'>total files: {fileManager.numFiles}</h2>
                 <h2 className='text-lg text-center font-medium'>file size: {fileManager.size}</h2>

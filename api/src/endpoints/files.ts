@@ -49,14 +49,10 @@ const files = new Elysia({ name: 'files' })
         if (configDB.db.locked) return status(423, { error: 'instance is locked' });
         if (!sessionDB.has(session.value)) return status(401);
 
-        const stats = fs.statSync(fileDir);
-        if (!stats.isDirectory()) {
-            console.error('file directory is not a directory:', fileDir);
-            return status(500);
-        }
-
         const files = scanTree();
         const fileTree: TreeNode = { name: '/', type: 'folder', fullPath: '', children: [] };
+
+        let size = 0;
 
         files.forEach(e => {
             if (e.endsWith('.auth') || e.endsWith('/')) return;
@@ -79,9 +75,12 @@ const files = new Elysia({ name: 'files' })
 
             const fullPath = treeSegment.fullPath + '/' + parts[0];
             treeSegment.children.push({ type: 'file', name: parts[0], fullPath, locked: files.has((fullPath + '.auth').slice(1)) });
+
+            const sizeData = fs.statSync(path.join(fileDir, e));
+            size += sizeData.size;
         });
 
-        return { node: fileTree, size: stats.size };
+        return { node: fileTree, size };
     }, { cookie: t.Object({ session: t.String() }) })
 
     .post('/api/file/pull/url', ({ body, cookie: { session } }) => {
