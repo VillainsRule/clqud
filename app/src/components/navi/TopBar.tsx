@@ -2,11 +2,10 @@ import { useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
-import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import { Input } from '@/components/ui/input';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 
 import Copy from 'lucide-react/icons/copy';
-import Link2 from 'lucide-react/icons/link-2';
 import LogOut from 'lucide-react/icons/log-out';
 import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
@@ -112,7 +111,9 @@ export const Breadcrumb = observer(function Breadcrumb() {
                                 className='h-6 text-sm border-0 rounded-none ring-0 focus-visible:ring-0 p-0 bg-transparent w-40 font-medium'
                             />
                         ) : (
-                            <span className={isFile ? 'font-medium text-foreground truncate' : 'text-muted-foreground truncate'}>{part === '' ? 'clqud' : part}</span>
+                            <span className={isFile ? 'font-medium text-foreground truncate cursor-pointer' : 'text-muted-foreground truncate'} onClick={() => {
+                                if (isFile) navigator.clipboard.writeText(path);
+                            }}>{part === '' ? 'clqud' : part}</span>
                         )}
 
                         {!isFile && <span className='text-muted-foreground/40 mx-1.5 select-none'>/</span>}
@@ -123,17 +124,8 @@ export const Breadcrumb = observer(function Breadcrumb() {
             {!isRenaming && <div className='inline-flex items-center gap-0.5 shrink-0 p-1 rounded-full bg-muted/60'>
                 <Tooltip>
                     <TooltipTrigger asChild>
-                        <button className={actionButtonClass} onClick={() => navigator.clipboard.writeText(path)}>
-                            <Copy className='w-3.75 h-3.75' />
-                        </button>
-                    </TooltipTrigger>
-                    <TooltipContent>Copy Path</TooltipContent>
-                </Tooltip>
-
-                <Tooltip>
-                    <TooltipTrigger asChild>
                         <button className={actionButtonClass} onClick={() => navigator.clipboard.writeText(location.origin + path)}>
-                            <Link2 className='w-3.75 h-3.75' />
+                            <Copy className='w-3.75 h-3.75' />
                         </button>
                     </TooltipTrigger>
                     <TooltipContent>Copy URL</TooltipContent>

@@ -50,7 +50,7 @@ const app = new Elysia()
     .get('/', () => new Response(cachedIndex, { headers: { 'Content-Type': 'text/html' } }))
     .get('/&', () => new Response(cachedIndex, { headers: { 'Content-Type': 'text/html' } }))
     .get('/&/*', () => new Response(cachedIndex, { headers: { 'Content-Type': 'text/html' } }))
-    .all('/*', ({ path: p, cookie: { cp }, query: { d, x } }) => {
+    .all('/*', ({ path: p, cookie: { cp }, query: { d, x }, headers: { accept } }) => {
         const requestedPath = path.join(fileDir, decodeURIComponent(p));
         if (requestedPath.endsWith('.auth') || requestedPath.endsWith('.DS_Store')) return new Response(null, { status: 404 });
 
@@ -87,7 +87,12 @@ const app = new Elysia()
             });
         }
 
-        return new Response(cachedIndex);
+        if (accept?.includes('text/html')) return new Response(
+            fs.createReadStream(path.join(import.meta.dirname, '../../app/dist/404.html')),
+            { status: 404, headers: { 'Content-Type': 'text/html' } }
+        );
+
+        return new Response(null, { status: 404 });
     }, { query: t.Object({ x: t.Optional(t.String()), d: t.Optional(t.String()) }), cookie: t.Object({ cp: t.Optional(t.String()) }) })
     .get('/favicon.ico', ({ set }) => {
         set.headers['Cache-Control'] = 'public, max-age=31536000, immutable, no-transform';
