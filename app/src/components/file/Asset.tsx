@@ -13,23 +13,21 @@ const AssetViewer = observer(function AssetViewer() {
     const [directLink, setDirectLink] = useState('');
 
     useEffect(() => {
-        const inferredExt = getExt(fileManager.currentFilePath);
-        if (inferredExt) {
-            if (imageExtensions.includes(inferredExt)) setType('image');
-            else if (videoExtensions.includes(inferredExt)) setType('video');
-            else if (audioExtensions.includes(inferredExt)) setType('audio');
-        }
+        const requestedPath = fileManager.currentFilePath;
 
-        if (!fileManager.currentFileContent) {
-            const requestedPath = fileManager.currentFilePath;
-            fileManager.currentFileContent = 'loading...';
+        setType('');
+        setDirectLink('');
 
-            api.file.pull.url.post({ path: requestedPath }).then((res) => {
-                if (fileManager.currentFilePath !== requestedPath) return;
-                if (res.data) setDirectLink(res.data.url);
-                else alert('failed to load file content');
-            });
-        }
+        const inferredExt = getExt(requestedPath);
+        if (imageExtensions.includes(inferredExt)) setType('image');
+        else if (videoExtensions.includes(inferredExt)) setType('video');
+        else if (audioExtensions.includes(inferredExt)) setType('audio');
+
+        api.file.pull.url.post({ path: requestedPath }).then((res) => {
+            if (fileManager.currentFilePath !== requestedPath) return;
+            if (res.data) setDirectLink(res.data.url);
+            else alert('failed to load file content');
+        });
     }, [fileManager.currentFilePath]);
 
     return (

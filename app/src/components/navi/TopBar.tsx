@@ -59,6 +59,7 @@ export const Breadcrumb = observer(function Breadcrumb() {
     const [isRenaming, setIsRenaming] = useState(false);
     const [renameValue, setRenameValue] = useState('');
     const renameInputRef = useRef<HTMLInputElement>(null);
+    const renameSubmittedRef = useRef(false);
 
     if (!fileManager.currentFilePath) return null;
 
@@ -67,6 +68,7 @@ export const Breadcrumb = observer(function Breadcrumb() {
     const fileName = segments[segments.length - 1];
 
     const startRenaming = () => {
+        renameSubmittedRef.current = false;
         setRenameValue(fileName);
         setIsRenaming(true);
 
@@ -77,6 +79,9 @@ export const Breadcrumb = observer(function Breadcrumb() {
     };
 
     const submitRename = () => {
+        if (renameSubmittedRef.current) return;
+        renameSubmittedRef.current = true;
+
         setIsRenaming(false);
         const trimmed = renameValue.trim();
         if (trimmed && trimmed !== fileName) fileManager.renameFile(path, trimmed);

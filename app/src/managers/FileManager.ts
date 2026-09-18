@@ -29,7 +29,6 @@ class FileManager {
     maxSizeMB: number = 100;
 
     currentFilePath: string = '';
-    currentFileContent: string = '';
 
     dragHoverPath: string | null = null;
     isDraggingExternal: boolean = false;
@@ -204,12 +203,10 @@ class FileManager {
     select(file: string) {
         if (file === '') {
             this.currentFilePath = '';
-            this.currentFileContent = '';
             return;
         }
 
         this.currentFilePath = file;
-        this.currentFileContent = '';
 
         this.fileHistory.push(file);
     }

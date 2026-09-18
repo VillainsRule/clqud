@@ -73,6 +73,9 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
     const inputRef = useRef<HTMLInputElement>(null);
     const renameInputRef = useRef<HTMLInputElement>(null);
 
+    const creatingSubmittedRef = useRef(false);
+    const renameSubmittedRef = useRef(false);
+
     const isCreatingInThisFolder = fileManager.creatingType && fileManager.creatingPath === node.fullPath;
     const inferredExtension = getExt(node.name);
 
@@ -115,6 +118,9 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
     };
 
     const handleCreateFile = async () => {
+        if (creatingSubmittedRef.current) return;
+        creatingSubmittedRef.current = true;
+
         if (!createdName.trim()) return fileManager.setCreating(null);
 
         const fullPath = node.fullPath === '/'
@@ -131,6 +137,9 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
     };
 
     const handleRename = () => {
+        if (renameSubmittedRef.current) return;
+        renameSubmittedRef.current = true;
+
         if (!renamedName.trim()) {
             setIsRenaming(false);
             return;
@@ -141,6 +150,7 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
     };
 
     const startRenaming = () => {
+        renameSubmittedRef.current = false;
         setRenamedName(node.name);
         setIsRenaming(true);
 
@@ -259,8 +269,8 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
                 </ContextMenuTrigger>
 
                 {node.type === 'folder' ? <ContextMenuContent className='p-2'>
-                    <ContextMenuItem onClick={() => { fileManager.setCreating('folder', node.fullPath); setIsExpanded(true); }}>New Folder</ContextMenuItem>
-                    <ContextMenuItem onClick={() => { fileManager.setCreating('file', node.fullPath); setIsExpanded(true); }}>New File</ContextMenuItem>
+                    <ContextMenuItem onClick={() => { creatingSubmittedRef.current = false; fileManager.setCreating('folder', node.fullPath); setIsExpanded(true); }}>New Folder</ContextMenuItem>
+                    <ContextMenuItem onClick={() => { creatingSubmittedRef.current = false; fileManager.setCreating('file', node.fullPath); setIsExpanded(true); }}>New File</ContextMenuItem>
                     <ContextMenuItem onClick={() => {
                         const input = document.createElement('input');
                         input.type = 'file';

@@ -11,11 +11,18 @@ const CodeViewer = observer(function CodeViewer() {
     const [content, setContent] = useState('');
 
     useEffect(() => {
-        if (!fileManager.currentFileContent) fetch('/api/file/pull/contents', {
+        const requestedPath = fileManager.currentFilePath;
+        setContent('');
+
+        fetch('/api/file/pull/contents', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ path: fileManager.currentFilePath })
-        }).then(res => res.text()).then(text => setContent(text)).catch(() => alert('failed to load file content'));
+            body: JSON.stringify({ path: requestedPath })
+        }).then(res => res.text()).then(text => {
+            if (fileManager.currentFilePath === requestedPath) setContent(text);
+        }).catch(() => {
+            if (fileManager.currentFilePath === requestedPath) alert('failed to load file content');
+        });
     }, [fileManager.currentFilePath]);
 
     return (
