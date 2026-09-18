@@ -18,6 +18,7 @@ export interface UploadTask {
 const MAX_CONCURRENT_UPLOADS = 3;
 const MAX_VISIBLE_UPLOADS = 3;
 const MIN_SHOWN_MS = 2000;
+const CHUNK_SIZE = 80 * 1024 * 1024;
 
 class FileManager {
     tree: TreeNode = { name: '/', fullPath: '/', type: 'folder', children: [] };
@@ -89,21 +90,51 @@ class FileManager {
         if (this.currentFilePath === oldPath) this.currentFilePath = newPath;
     }
 
+    private sendChunk(uploadId: string, path: string, chunkIndex: number, totalChunks: number, chunk: Blob, onProgress: (loaded: number) => void): Promise<void> {
+        return new Promise((resolve, reject) => {
+            const formData = new FormData();
+            formData.append('uploadId', uploadId);
+            formData.append('path', path);
+            formData.append('chunkIndex', String(chunkIndex));
+            formData.append('totalChunks', String(totalChunks));
+            formData.append('chunk', chunk);
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/api/file/upload/chunk');
+
+            xhr.upload.onprogress = (e) => {
+                if (e.lengthComputable) onProgress(e.loaded);
+            };
+
+            xhr.onload = () => {
+                if (xhr.status >= 200 && xhr.status < 300) resolve();
+                else {
+                    try {
+                        reject(new Error(JSON.parse(xhr.responseText)?.error || 'upload failed'));
+                    } catch {
+                        reject(new Error('upload failed'));
+                    }
+                }
+            };
+
+            xhr.onerror = () => reject(new Error('network error'));
+
+            xhr.send(formData);
+        });
+    }
+
     async uploadFiles(files: FileList | File[], targetPath: string, useRelativePath = false) {
         const fileArray = Array.from(files);
         if (!fileArray.length) return;
 
-        const formData = new FormData();
-        formData.append('files', new File([], '_forceArray.txt'));
-        formData.append('paths', '');
-
-        for (const file of fileArray) {
+        const entries = fileArray.map(file => {
             const relativePath = useRelativePath && (file as any).webkitRelativePath
                 ? (file as any).webkitRelativePath
                 : file.name;
-            formData.append('files', file);
-            formData.append('paths', targetPath === '/' ? `/${relativePath}` : `${targetPath}/${relativePath}`);
-        }
+            return { file, path: targetPath === '/' ? `/${relativePath}` : `${targetPath}/${relativePath}` };
+        });
+
+        const totalBytes = entries.reduce((sum, e) => sum + e.file.size, 0) || 1;
 
         this.uploads.push({
             id: crypto.randomUUID(),
@@ -119,41 +150,33 @@ class FileManager {
         this.activeUploads++;
         task.status = 'uploading';
 
-        await new Promise<void>((resolve) => {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/api/file/upload');
+        let doneBytes = 0;
 
-            xhr.upload.onprogress = (e) => {
-                if (e.lengthComputable) task.progress = Math.round((e.loaded / e.total) * 100);
-            };
+        try {
+            for (const entry of entries) {
+                const uploadId = crypto.randomUUID();
+                const totalChunks = Math.max(1, Math.ceil(entry.file.size / CHUNK_SIZE));
+                let fileLoaded = 0;
 
-            xhr.onload = () => {
-                task.progress = 100;
-                task.shownAt = Date.now();
-
-                if (xhr.status >= 200 && xhr.status < 300) {
-                    task.status = 'done';
-                } else {
-                    task.status = 'error';
-                    try {
-                        task.error = JSON.parse(xhr.responseText)?.error || 'upload failed';
-                    } catch {
-                        task.error = 'upload failed';
-                    }
+                for (let i = 0; i < totalChunks; i++) {
+                    const chunk = entry.file.slice(i * CHUNK_SIZE, Math.min((i + 1) * CHUNK_SIZE, entry.file.size));
+                    await this.sendChunk(uploadId, entry.path, i, totalChunks, chunk, (loaded) => {
+                        task.progress = Math.round(((doneBytes + fileLoaded + loaded) / totalBytes) * 100);
+                    });
+                    fileLoaded += chunk.size;
                 }
 
-                resolve();
-            };
+                doneBytes += entry.file.size;
+            }
 
-            xhr.onerror = () => {
-                task.status = 'error';
-                task.error = 'network error';
-                task.shownAt = Date.now();
-                resolve();
-            };
+            task.progress = 100;
+            task.status = 'done';
+        } catch (err) {
+            task.status = 'error';
+            task.error = err instanceof Error ? err.message : 'upload failed';
+        }
 
-            xhr.send(formData);
-        });
+        task.shownAt = Date.now();
 
         this.activeUploads--;
         this.uploadWaiters.shift()?.();

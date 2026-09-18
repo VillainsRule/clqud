@@ -56,6 +56,7 @@ const files = new Elysia({ name: 'files' })
 
         files.forEach(e => {
             if (e.endsWith('.auth') || e.endsWith('/')) return;
+            if (e === '.tmp-uploads' || e.startsWith('.tmp-uploads/')) return;
 
             const parts = e.split('/');
 
@@ -205,38 +206,65 @@ const files = new Elysia({ name: 'files' })
         return { size };
     }, { body: t.Object({ path: t.String() }), cookie: t.Object({ session: t.String() }) })
 
-    .post('/api/file/upload', async ({ body, cookie: { session } }) => {
+    .post('/api/file/upload/chunk', async ({ body, cookie: { session } }) => {
         if (configDB.db.locked) return status(423, { error: 'instance is locked' });
         if (!sessionDB.has(session.value)) return status(401);
 
-        const files = body.files.slice(1, body.files.length);
-        const paths = body.paths.slice(1, body.paths.length);
+        const { uploadId, path: relPath, chunkIndex, totalChunks, chunk } = body;
 
-        if (files.length !== paths.length) return status(400, { error: 'files and paths length mismatch' });
+        if (!/^[a-zA-Z0-9-]+$/.test(uploadId)) return status(400, { error: 'invalid upload id' });
 
-        for (let i = 0; i < files.length; i++) {
-            const fileData = await files[i].arrayBuffer();
-            if (fileData.byteLength > configDB.db.maxSizeMB * 1024 * 1024)
-                return status(400, { error: `file ${paths[i]} size exceeds ${configDB.db.maxSizeMB}mb limit` });
+        const filePath = path.join(fileDir, relPath);
+        if (!filePath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
+        if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
 
-            const filePath = path.join(fileDir, paths[i]);
-            if (!filePath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
-            if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
+        const ne = getNameExt(filePath);
+        if (!validatePath(ne, relPath.includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
 
-            const ne = getNameExt(filePath);
-            if (!validatePath(ne, paths[i].includes('.') ? 'file' : 'folder')) return status(400, { error: 'invalid file path' });
+        if (chunkIndex === 0 && fs.existsSync(filePath) && fs.statSync(filePath).isFile())
+            return status(400, { error: `file ${relPath} already exists` });
 
-            if (fs.existsSync(filePath) && fs.statSync(filePath).isFile())
-                return status(400, { error: `file ${paths[i]} already exists` });
+        const tmpDir = path.join(fileDir, '.tmp-uploads', uploadId);
+        if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
 
+        const chunkData = Buffer.from(await chunk.arrayBuffer());
+
+        let totalSoFar = chunkData.byteLength;
+        for (let i = 0; i < chunkIndex; i++) {
+            const partPath = path.join(tmpDir, `${i}`);
+            if (fs.existsSync(partPath)) totalSoFar += fs.statSync(partPath).size;
+        }
+
+        if (totalSoFar > configDB.db.maxSizeMB * 1024 * 1024) {
+            fs.rmSync(tmpDir, { recursive: true, force: true });
+            return status(400, { error: `file ${relPath} size exceeds ${configDB.db.maxSizeMB}mb limit` });
+        }
+
+        fs.writeFileSync(path.join(tmpDir, `${chunkIndex}`), chunkData);
+
+        if (chunkIndex === totalChunks - 1) {
             const dirPath = path.dirname(filePath);
             if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
 
-            fs.writeFileSync(filePath, Buffer.from(fileData));
+            const writeStream = fs.createWriteStream(filePath);
+            for (let i = 0; i < totalChunks; i++) writeStream.write(fs.readFileSync(path.join(tmpDir, `${i}`)));
+            writeStream.end();
+
+            fs.rmSync(tmpDir, { recursive: true, force: true });
         }
 
         return {};
-    }, { parse: 'formdata', body: t.Object({ files: t.Array(t.File()), paths: t.Array(t.String()) }), cookie: t.Object({ session: t.String() }) })
+    }, {
+        parse: 'formdata',
+        body: t.Object({
+            uploadId: t.String(),
+            path: t.String(),
+            chunkIndex: t.Numeric(),
+            totalChunks: t.Numeric(),
+            chunk: t.File()
+        }),
+        cookie: t.Object({ session: t.String() })
+    })
 
     .post('/api/file/password/set', ({ body, cookie: { session } }) => {
         if (configDB.db.locked) return status(423, { error: 'instance is locked' });
