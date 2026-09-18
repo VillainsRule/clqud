@@ -26,7 +26,7 @@ import { ShaddProvider } from './lib/shadd'
 
 import './index.css'
 
-function Container({ element: Element, isAsset }: { element: React.ComponentType<any>, isAsset?: boolean }) {
+const Container = observer(function Container({ element: Element, isAsset }: { element: React.ComponentType<any>, isAsset?: boolean }) {
     const location = useLocation();
     const dragCounterRef = useRef(0);
 
@@ -75,7 +75,7 @@ function Container({ element: Element, isAsset }: { element: React.ComponentType
 
     return (
         <div
-            className='flex gap-4 h-screen w-screen p-5 bg-background'
+            className='flex gap-3 md:gap-4 h-screen w-screen p-3 md:p-5 bg-background'
             onDragEnter={handleDragEnter}
             onDragLeave={handleDragLeave}
             onDragOver={handleDragOver}
@@ -83,12 +83,16 @@ function Container({ element: Element, isAsset }: { element: React.ComponentType
         >
             <div className='hidden'><Editor /></div>
 
-            <div className='hidden md:block min-w-84 max-w-84 h-full bg-card border rounded-2xl shadow-lg overflow-hidden'>
+            {fileManager.sidebarOpen && (
+                <div className='fixed inset-0 bg-black/50 z-40 md:hidden' onClick={() => fileManager.sidebarOpen = false} />
+            )}
+
+            <div className={`fixed md:static bottom-0 left-0 right-0 md:top-0 z-50 h-[85.5vh] md:h-full w-full md:w-84 md:min-w-84 md:max-w-84 bg-card border rounded-t-2xl md:rounded-2xl shadow-lg overflow-hidden transition-transform duration-200 ease-out md:translate-y-0 md:translate-x-0 ${fileManager.sidebarOpen ? 'translate-y-0' : 'translate-y-full'}`}>
                 <SideBar />
             </div>
 
             <div className='flex flex-col w-full h-full gap-3 min-w-0'>
-                <div className='hidden md:block shrink-0 bg-card border rounded-2xl shadow-lg px-6 py-3'>
+                <div className='shrink-0 bg-card border rounded-2xl shadow-lg px-4 md:px-6 py-3'>
                     <TopBar />
                 </div>
 
@@ -114,7 +118,7 @@ function Container({ element: Element, isAsset }: { element: React.ComponentType
             <UploadQueue />
         </div>
     )
-}
+});
 
 const hasCookie = document.cookie.split(';').some((cookie) => cookie.trim().startsWith('cp='));
 
@@ -131,30 +135,20 @@ const App = observer(function App() {
         <h2>is locked. you can unlock it by confirming through voauth:</h2>
 
         <Button className='mt-1' onClick={() => location.href = authManager.redirect.replace('ACTION', 'unlock')}>confirm with voauth</Button>
-    </div> : <>
-        <div className='hidden md:block'><BrowserRouter>
-            <Routes>
-                <Route path='/' element={<Welcome />} />
+    </div> : <BrowserRouter>
+        <Routes>
+            <Route path='/' element={<Welcome />} />
 
-                <Route path='/&' element={<Container element={Dashboard} />} />
-                <Route path='/&/file' element={<Container element={FileSwitch} isAsset />} />
-                <Route path='/&/config' element={<Container element={Config} />} />
+            <Route path='/&' element={<Container element={Dashboard} />} />
+            <Route path='/&/file' element={<Container element={FileSwitch} isAsset />} />
+            <Route path='/&/config' element={<Container element={Config} />} />
 
-                <Route path='*' element={<div className='flex flex-col justify-center items-center gap-2 h-screen w-screen'>
-                    <h1 className='text-4xl font-extrabold tracking-tight text-primary drop-shadow-sm'>clqud</h1>
-                    <h2>404 not found</h2>
-                </div>} />
-            </Routes>
-        </BrowserRouter></div>
-
-        <div className='md:hidden flex flex-col justify-center items-center text-center px-6 gap-2 h-screen w-screen'>
-            <h1 className='text-4xl font-extrabold tracking-tight text-primary drop-shadow-sm'>clqud</h1>
-            <h2>unfortunately does not support mobile at the moment. future goals?</h2>
-            <h2>however, in the event of an emergency, you may need to lock the instance. you can confirm with voauth to do that below:</h2>
-
-            <Button className='mt-1' onClick={() => location.href = authManager.redirect.replace('ACTION', 'lock')}>lock instance</Button>
-        </div>
-    </>) : <div className='flex flex-col justify-center items-center text-center px-6 gap-2 h-screen w-screen'>
+            <Route path='*' element={<div className='flex flex-col justify-center items-center gap-2 h-screen w-screen'>
+                <h1 className='text-4xl font-extrabold tracking-tight text-primary drop-shadow-sm'>clqud</h1>
+                <h2>404 not found</h2>
+            </div>} />
+        </Routes>
+    </BrowserRouter>) : <div className='flex flex-col justify-center items-center text-center px-6 gap-2 h-screen w-screen'>
         <h1 className='text-4xl font-extrabold tracking-tight text-primary drop-shadow-sm'>clqud</h1>
         <h2>is loading...</h2>
     </div>

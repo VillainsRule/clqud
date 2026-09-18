@@ -7,6 +7,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip
 
 import Copy from 'lucide-react/icons/copy';
 import LogOut from 'lucide-react/icons/log-out';
+import Menu from 'lucide-react/icons/menu';
 import Pencil from 'lucide-react/icons/pencil';
 import Trash2 from 'lucide-react/icons/trash-2';
 import Wrench from 'lucide-react/icons/wrench';
@@ -23,10 +24,13 @@ const TopBar = observer(function TopBar() {
     const navigate = useNavigate();
 
     return (
-        <div className='flex justify-between items-center'>
-            <h1 className='font-semibold text-lg'>welcome, admin!</h1>
+        <div className='flex justify-between items-center gap-3'>
+            <div className='flex items-center gap-3 min-w-0'>
+                <Menu className='w-6 h-6 shrink-0 cursor-pointer text-accent-foreground md:hidden' onClick={() => fileManager.sidebarOpen = !fileManager.sidebarOpen} />
+                <h1 className='font-semibold text-lg truncate'>welcome, admin!</h1>
+            </div>
 
-            <div className='flex items-center gap-6 min-h-full'>
+            <div className='flex items-center gap-6 min-h-full shrink-0'>
                 <Tooltip>
                     <TooltipTrigger asChild>
                         <Wrench className='w-6 h-6 cursor-pointer text-accent-foreground' onClick={() => navigate('/&/config')} />

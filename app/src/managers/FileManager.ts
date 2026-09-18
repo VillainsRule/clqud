@@ -40,6 +40,8 @@ class FileManager {
     creatingType: 'file' | 'folder' | null = null;
     creatingPath: string | null = null;
 
+    sidebarOpen: boolean = typeof window !== 'undefined' && window.innerWidth < 768;
+
     uploads: UploadTask[] = [];
     private activeUploads: number = 0;
     private uploadWaiters: (() => void)[] = [];

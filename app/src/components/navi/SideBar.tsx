@@ -186,7 +186,7 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
                 <ContextMenuTrigger>
                     <button
                         draggable={level > 0}
-                        onClick={() => node.type === 'folder' ? setIsExpanded(!isExpanded) : (fileManager.select(node.fullPath), navigate('/&/file'))}
+                        onClick={() => node.type === 'folder' ? setIsExpanded(!isExpanded) : (fileManager.select(node.fullPath), navigate('/&/file'), fileManager.sidebarOpen = false)}
                         onDragStart={level > 0 ? handleDragStart : undefined}
                         onDragEnd={level > 0 ? () => (fileManager.internalDragPath = null, setInternalDragHover(null)) : undefined}
                         onDragEnter={(e) => {
@@ -466,7 +466,7 @@ const SideBar = observer(function SideBar() {
 
     return (
         <div className='h-full w-full flex flex-col pl-3.25 pr-6 py-6'>
-            <div className='flex justify-center cursor-pointer items-center w-full mb-4 select-none' onClick={() => navigate('/')}>
+            <div className='flex justify-center cursor-pointer items-center w-full mb-4 select-none' onClick={() => (navigate('/'), fileManager.sidebarOpen = false)}>
                 <h1 className='text-4xl font-extrabold tracking-tight text-primary drop-shadow-sm'>clqud</h1>
             </div>
 
