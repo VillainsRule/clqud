@@ -224,33 +224,24 @@ const files = new Elysia({ name: 'files' })
         if (chunkIndex === 0 && fs.existsSync(filePath) && fs.statSync(filePath).isFile())
             return status(400, { error: `file ${relPath} already exists` });
 
-        const tmpDir = path.join(fileDir, '.tmp-uploads', uploadId);
+        const tmpDir = path.join(fileDir, '.tmp-uploads');
         if (!fs.existsSync(tmpDir)) fs.mkdirSync(tmpDir, { recursive: true });
 
+        const tmpFile = path.join(tmpDir, `${uploadId}.tmp`);
         const chunkData = Buffer.from(await chunk.arrayBuffer());
 
-        let totalSoFar = chunkData.byteLength;
-        for (let i = 0; i < chunkIndex; i++) {
-            const partPath = path.join(tmpDir, `${i}`);
-            if (fs.existsSync(partPath)) totalSoFar += fs.statSync(partPath).size;
-        }
-
-        if (totalSoFar > configDB.db.maxSizeMB * 1024 * 1024) {
-            fs.rmSync(tmpDir, { recursive: true, force: true });
+        const currentSize = fs.existsSync(tmpFile) ? fs.statSync(tmpFile).size : 0;
+        if (currentSize + chunkData.byteLength > configDB.db.maxSizeMB * 1024 * 1024) {
+            if (fs.existsSync(tmpFile)) fs.unlinkSync(tmpFile);
             return status(400, { error: `file ${relPath} size exceeds ${configDB.db.maxSizeMB}mb limit` });
         }
 
-        fs.writeFileSync(path.join(tmpDir, `${chunkIndex}`), chunkData);
+        fs.appendFileSync(tmpFile, chunkData);
 
         if (chunkIndex === totalChunks - 1) {
             const dirPath = path.dirname(filePath);
             if (!fs.existsSync(dirPath)) fs.mkdirSync(dirPath, { recursive: true });
-
-            const writeStream = fs.createWriteStream(filePath);
-            for (let i = 0; i < totalChunks; i++) writeStream.write(fs.readFileSync(path.join(tmpDir, `${i}`)));
-            writeStream.end();
-
-            fs.rmSync(tmpDir, { recursive: true, force: true });
+            fs.renameSync(tmpFile, filePath);
         }
 
         return {};
