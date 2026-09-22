@@ -29,10 +29,23 @@ import './index.css'
 const Container = observer(function Container({ element: Element, isAsset }: { element: React.ComponentType<any>, isAsset?: boolean }) {
     const location = useLocation();
     const dragCounterRef = useRef(0);
+    const bodyDragCounterRef = useRef(0);
 
     useEffect(() => {
         if (!location.pathname.includes('auth') && !authManager.loggedIn) window.location.href = '/&/auth';
     }, [authManager.loggedIn]);
+
+    useEffect(() => {
+        if (location.pathname !== '/&') return;
+
+        const applyForWidth = () => {
+            if (window.innerWidth < 768) fileManager.sidebarOpen = true;
+        };
+
+        applyForWidth();
+        window.addEventListener('resize', applyForWidth);
+        return () => window.removeEventListener('resize', applyForWidth);
+    }, [location.pathname]);
 
     const [bodyDraggedOver, setBodyDraggedOver] = useState(false);
 
@@ -48,6 +61,8 @@ const Container = observer(function Container({ element: Element, isAsset }: { e
         if (dragCounterRef.current === 0) {
             fileManager.isDraggingExternal = false;
             fileManager.dragHoverPath = null;
+            bodyDragCounterRef.current = 0;
+            setBodyDraggedOver(false);
         }
     };
 
@@ -60,6 +75,7 @@ const Container = observer(function Container({ element: Element, isAsset }: { e
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault();
         dragCounterRef.current = 0;
+        bodyDragCounterRef.current = 0;
         setBodyDraggedOver(false);
 
         const files = Array.from(e.dataTransfer.files);
@@ -98,11 +114,18 @@ const Container = observer(function Container({ element: Element, isAsset }: { e
 
                 <div
                     className={`relative flex flex-col w-full flex-1 min-h-0 bg-card border rounded-2xl shadow-lg p-3 ${isAsset ? 'overflow-hidden' : 'overflow-y-auto custom-scrollbar'}`}
-                    onDragEnter={(e: React.DragEvent) => e.dataTransfer.types.includes('Files') && setBodyDraggedOver(true)}
+                    onDragEnter={(e: React.DragEvent) => {
+                        if (!e.dataTransfer.types.includes('Files')) return;
+                        bodyDragCounterRef.current++;
+                        setBodyDraggedOver(true);
+                    }}
                     onDragLeave={(e: React.DragEvent) => {
                         if (!e.dataTransfer.types.includes('Files')) return;
-                        dragCounterRef.current--;
-                        if (dragCounterRef.current === 0) setBodyDraggedOver(false);
+                        bodyDragCounterRef.current--;
+                        if (bodyDragCounterRef.current <= 0) {
+                            bodyDragCounterRef.current = 0;
+                            setBodyDraggedOver(false);
+                        }
                     }}
                     onDragOver={(e: React.DragEvent) => e.dataTransfer.types.includes('Files') && e.preventDefault()}
                 >
@@ -110,7 +133,7 @@ const Container = observer(function Container({ element: Element, isAsset }: { e
 
                     <div className={`flex flex-col items-center w-full ${isAsset ? 'flex-1 min-h-0' : ''}`}>
                         <Element />
-                        {bodyDraggedOver && <div className='absolute inset-0 backdrop-blur-xs flex justify-center items-center text-xl rounded-2xl'>drop to upload to /!</div>}
+                        {bodyDraggedOver && <div className='absolute inset-0 backdrop-blur-xs flex justify-center items-center rounded-2xl font-medium font-mono'>drop to upload...</div>}
                     </div>
                 </div>
             </div>
