@@ -207,7 +207,6 @@ class FileManager {
         }
 
         this.currentFilePath = file;
-
         this.fileHistory.push(file);
     }
 }

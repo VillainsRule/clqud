@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
 import fileManager from '@/managers/FileManager';
@@ -9,6 +10,8 @@ import { audioExtensions, imageExtensions, videoExtensions } from '@/lib/utils';
 import api from '@/lib/eden';
 
 const AssetViewer = observer(function AssetViewer() {
+    const navigate = useNavigate();
+
     const [type, setType] = useState<'image' | 'audio' | 'video' | ''>('');
     const [directLink, setDirectLink] = useState('');
 
@@ -26,7 +29,10 @@ const AssetViewer = observer(function AssetViewer() {
         api.file.pull.url.post({ path: requestedPath }).then((res) => {
             if (fileManager.currentFilePath !== requestedPath) return;
             if (res.data) setDirectLink(res.data.url);
-            else alert('failed to load file content');
+            else {
+                fileManager.select('');
+                navigate('/&');
+            }
         });
     }, [fileManager.currentFilePath]);
 

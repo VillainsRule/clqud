@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { observer } from 'mobx-react-lite';
 
 import { Editor } from '@monaco-editor/react';
@@ -8,6 +9,8 @@ import fileManager from '@/managers/FileManager';
 import api from '@/lib/eden';
 
 const CodeViewer = observer(function CodeViewer() {
+    const navigate = useNavigate();
+
     const [content, setContent] = useState('');
 
     useEffect(() => {
@@ -18,10 +21,14 @@ const CodeViewer = observer(function CodeViewer() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ path: requestedPath })
-        }).then(res => res.text()).then(text => {
-            if (fileManager.currentFilePath === requestedPath) setContent(text);
-        }).catch(() => {
-            if (fileManager.currentFilePath === requestedPath) alert('failed to load file content');
+        }).then(async (res) => {
+            if (fileManager.currentFilePath !== requestedPath) return;
+
+            if (res.status < 300) setContent(await res.text());
+            else {
+                fileManager.select('');
+                navigate('/&');
+            }
         });
     }, [fileManager.currentFilePath]);
 

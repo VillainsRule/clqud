@@ -22,12 +22,8 @@ const FileSwitch = observer(function FileSwitch() {
         if (fileManager.currentFilePath) return;
 
         const hashPath = decodeURIComponent(location.hash.slice(1));
-        if (hashPath) {
-            fileManager.select(hashPath.startsWith('/') ? hashPath : `/${hashPath}`);
-            return;
-        }
-
-        navigate('/&');
+        if (hashPath) fileManager.select(hashPath.startsWith('/') ? hashPath : `/${hashPath}`);
+        else navigate('/&');
     }, [fileManager.currentFilePath]);
 
     useEffect(() => {

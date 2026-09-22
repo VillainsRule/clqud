@@ -89,9 +89,9 @@ const files = new Elysia({ name: 'files' })
         if (!sessionDB.has(session.value)) return status(401);
 
         const filePath = path.join(fileDir, body.path);
-        if (!filePath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
-        if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
-        if (!fs.existsSync(filePath)) return status(400, { error: 'file does not exist' });
+        if (!filePath.startsWith(fileDir + path.sep)) return status(400, 'invalid file path');
+        if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, 'invalid file path');
+        if (!fs.existsSync(filePath)) return status(400, 'file does not exist');
 
         const passwordPath = filePath + '.auth';
         if (fs.existsSync(passwordPath)) {
@@ -105,9 +105,9 @@ const files = new Elysia({ name: 'files' })
         if (!sessionDB.has(session.value)) return status(401);
 
         const filePath = path.join(fileDir, body.path);
-        if (!filePath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
-        if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
-        if (!fs.existsSync(filePath)) return status(400, { error: 'file does not exist' });
+        if (!filePath.startsWith(fileDir + path.sep)) return status(400, 'invalid file path');
+        if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, 'invalid file path');
+        if (!fs.existsSync(filePath)) return status(400, 'file does not exist');
 
         const fileContents = fs.readFileSync(filePath, 'utf-8');
         return new Response(fileContents, { headers: { 'content-type': 'text/plain' } });
