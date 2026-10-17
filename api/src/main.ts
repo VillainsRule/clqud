@@ -99,6 +99,7 @@ const app = new Elysia()
         set.headers['Content-Type'] = 'image/x-icon';
         return new Response(fs.createReadStream(path.join(import.meta.dirname, '../../app/dist/favicon.ico')), { headers: { 'Content-Type': 'image/x-icon' } });
     })
+    .get('/robots.txt', () => new Response('User-agent: *\nDisallow: /', { headers: { 'Content-Type': 'text/plain' } }))
     .use(serve)
     .use(admin)
     .use(auth)
