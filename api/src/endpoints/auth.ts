@@ -50,7 +50,7 @@ const auth = new Elysia({ name: 'auth' })
             return new Response(null, { status: 302, headers: { Location: '/' } });
         } catch (error) {
             console.error(error);
-            return status(502, {});
+            return status(500, {});
         }
     }, { query: t.Object({ code: t.Optional(t.String()) }) })
 
@@ -74,7 +74,7 @@ const auth = new Elysia({ name: 'auth' })
             return new Response(null, { status: 302, headers: { Location: '/' } });
         } catch (error) {
             console.error(error);
-            return status(502, {});
+            return status(500, {});
         }
     }, { query: t.Object({ code: t.Optional(t.String()) }) })
 
@@ -98,7 +98,7 @@ const auth = new Elysia({ name: 'auth' })
             return new Response(null, { status: 302, headers: { Location: '/' } });
         } catch (error) {
             console.error(error);
-            return status(502, {});
+            return status(500, {});
         }
     }, { query: t.Object({ code: t.Optional(t.String()) }) })
 
