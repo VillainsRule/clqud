@@ -52,6 +52,7 @@ const app = new Elysia()
     .get('/&/*', () => new Response(cachedIndex, { headers: { 'Content-Type': 'text/html' } }))
     .all('/*', ({ path: p, cookie: { cp }, query: { d, x }, headers: { accept } }) => {
         const requestedPath = path.join(fileDir, decodeURIComponent(p));
+        if (!requestedPath.startsWith(fileDir + path.sep)) return new Response(null, { status: 404 });
         if (requestedPath.endsWith('.auth') || requestedPath.endsWith('.DS_Store')) return new Response(null, { status: 404 });
 
         if (fs.existsSync(requestedPath) && fs.statSync(requestedPath).isFile()) {
