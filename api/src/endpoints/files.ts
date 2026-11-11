@@ -160,13 +160,16 @@ const files = new Elysia({ name: 'files' })
         if (!filePath.startsWith(fileDir + path.sep)) return status(400, { error: 'invalid file path' });
         if (filePath.endsWith('.auth') || filePath.includes('.DS_Store')) return status(400, { error: 'invalid file path' });
 
-        if (!validatePath(filePath, body.type)) return status(400, { error: 'invalid file path' });
+        if (!validatePath(getNameExt(filePath), body.type)) return status(400, { error: 'invalid file path' });
         if (fs.existsSync(filePath)) return status(400, { error: 'file already exists' });
 
         if (body.type === 'folder') {
-            fs.mkdirSync(filePath);
+            fs.mkdirSync(filePath, { recursive: true });
             fs.writeFileSync(path.join(filePath, '.DS_Store'), '');
-        } else fs.writeFileSync(filePath, '');
+        } else {
+            fs.mkdirSync(path.dirname(filePath), { recursive: true });
+            fs.writeFileSync(filePath, '');
+        }
 
         return {};
     }, { body: t.Object({ path: t.String(), type: t.Union([t.Literal('file'), t.Literal('folder')]) }), cookie: t.Object({ session: t.String() }) })

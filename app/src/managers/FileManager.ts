@@ -82,7 +82,7 @@ class FileManager {
 
     async renameFile(oldPath: string, newName: string) {
         const lastSlash = oldPath.lastIndexOf('/');
-        const newPath = lastSlash > 0 ? oldPath.slice(0, lastSlash + 1) + newName : newName;
+        const newPath = lastSlash >= 0 ? oldPath.slice(0, lastSlash + 1) + newName : newName;
 
         await api.file.rename.post({ oldPath, newPath });
         await this.fetchTree();

@@ -127,10 +127,12 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
             ? `/${createdName}`
             : `${node.fullPath}/${createdName}`;
 
-        api.file.create.post({ path: fullPath, type: fileManager.creatingType || 'file' }).then(() => {
+        const createdType = fileManager.creatingType;
+        api.file.create.post({ path: fullPath, type: createdType || 'file' }).then(() => {
             fileManager.fetchTree();
             fileManager.setCreating(null);
-        }).catch(() => alert(`failed to create ${fileManager.creatingType === 'folder' ? 'folder' : 'file'}`));
+            if (createdType === 'file') { fileManager.select(fullPath); navigate('/&/file'); }
+        }).catch(() => alert(`failed to create ${createdType === 'folder' ? 'folder' : 'file'}`));
 
         setCreatedName('');
         fileManager.setCreating(null);
@@ -301,7 +303,8 @@ const FileTreeItem = observer(function FileTreeItem({ node, level }: FileTreeIte
                         shadd.confirm('delete folder', 'are you sure you want to delete this directory and EVERYTHING INSIDE? this CANNOT be undone!', () => {
                             api.file.delete.post({ path: node.fullPath }).then(() => {
                                 fileManager.fetchTree();
-                                fileManager.fileHistory = fileManager.fileHistory.filter(e => e !== node.fullPath);
+                                fileManager.fileHistory = fileManager.fileHistory.filter(e => !e.startsWith(node.fullPath + '/') && e !== node.fullPath);
+                                if (fileManager.currentFilePath === node.fullPath || fileManager.currentFilePath.startsWith(node.fullPath + '/')) { fileManager.select(''); navigate('/&'); }
                             })
                         });
                     }}>Delete</ContextMenuItem>

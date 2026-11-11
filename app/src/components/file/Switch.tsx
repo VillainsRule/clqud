@@ -50,11 +50,28 @@ const FileSwitch = observer(function FileSwitch() {
 
     if (type === 'code') return <CodeViewer />;
     if (type === 'image' || type === 'audio' || type === 'video') return <AssetViewer />;
-    else return <div className='text-center mt-5'>
+
+    return <div className='text-center mt-5'>
         <div>this file does not have a built-in clqud parser.</div>
         <div>if you believe it should, open an issue on <a className='underline' target='_blank' href='https://github.com/VillainsRule/clqud'>the repository</a>.</div>
         <br />
         <div>this file occupies {fileSpace}.</div>
+        <br />
+        <div>
+            <a className='underline cursor-pointer' onClick={() => {
+                const requestedPath = fileManager.currentFilePath;
+
+                fetch('/api/file/pull/contents', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ path: requestedPath })
+                }).then(async (res) => {
+                    if (fileManager.currentFilePath !== requestedPath) return;
+                    if (res.status < 300) setType('code');
+                    else alert('failed to load file content');
+                });
+            }}>open as text</a>
+        </div>
     </div>;
 });
 
